@@ -1,4 +1,4 @@
-FROM python:3.13-slim-bookworm AS builder
+FROM python:3.14-slim-bookworm AS builder
 
 ENV PYTHONDONTWRITEBYTECODE=1 \
     PYTHONUNBUFFERED=1 \
@@ -56,7 +56,7 @@ RUN mkdir -p /data/media /app/staticfiles \
     && DJANGO_SECRET_KEY=build-time-only-not-used-at-runtime python manage.py collectstatic --noinput
 
 
-FROM python:3.13-slim-bookworm AS runtime
+FROM python:3.14-slim-bookworm AS runtime
 
 ENV PYTHONDONTWRITEBYTECODE=1 \
     PYTHONUNBUFFERED=1 \
