@@ -104,6 +104,31 @@ maskin.
 Migrationer körs automatiskt vid uppstart av `web`-tjänsten, se
 `scripts/docker-entrypoint.sh`.
 
+nginx-konfigen ligger inline i `docker-compose.yml` (`configs:`), så en
+driftsättning behöver bara den filen och `.env`. Bakom en egen reverse
+proxy (t.ex. nginx-proxy-manager) på samma värd: lägg en
+`compose.override.yml` bredvid som tar bort den publicerade porten och
+ansluter nginx till proxyns nätverk, så når proxyn stacken på namnet
+`expensevibe-nginx`:
+
+```
+services:
+  nginx:
+    ports: !reset []
+    networks:
+      default:
+      proxy:
+        aliases:
+          - expensevibe-nginx
+
+networks:
+  proxy:
+    external: true
+```
+
+Proxyn ska skicka `X-Forwarded-Proto: https`; nginx för det vidare till
+Django som då bygger https-länkar.
+
 ## Frånvarorapportering
 
 Användarflödet (kalender, tidrapport, perioder, arbetsscheman) beskrivs i
