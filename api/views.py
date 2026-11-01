@@ -294,9 +294,10 @@ def absence_submit(request):
 
 @api_view(["GET"], approver=True)
 def approvals(request):
-    pending_expenses = Expense.objects.filter(status="submitted").select_related("employee", "category")
-    pending_mileage = MileageReport.objects.filter(status="submitted").select_related("employee")
-    pending_time = TimeReport.objects.filter(status="submitted").select_related("employee", "period")
+    user = request.user
+    pending_expenses = Expense.pending_for(user).select_related("employee", "category")
+    pending_mileage = MileageReport.pending_for(user).select_related("employee")
+    pending_time = TimeReport.pending_for(user).select_related("employee", "period")
     return JsonResponse(
         {
             "expenses": [_expense_json(e) for e in pending_expenses.order_by("submitted_at")],
@@ -306,11 +307,11 @@ def approvals(request):
     )
 
 
-def _pending(kind, pk):
+def _pending(kind, pk, user):
     model = _KINDS.get(kind)
     if model is None:
         raise Http404
-    item, error = _get_pending_item(model, pk)
+    item, error = _get_pending_item(model, pk, user)
     if item is None:
         return None, _error(error, 409)
     return item, None
@@ -318,7 +319,7 @@ def _pending(kind, pk):
 
 @api_view(["POST"], approver=True)
 def approve(request, kind, pk):
-    item, error = _pending(kind, pk)
+    item, error = _pending(kind, pk, request.user)
     if error:
         return error
     item.approve(request.user)
@@ -327,7 +328,7 @@ def approve(request, kind, pk):
 
 @api_view(["POST"], approver=True)
 def reject(request, kind, pk):
-    item, error = _pending(kind, pk)
+    item, error = _pending(kind, pk, request.user)
     if error:
         return error
     try:

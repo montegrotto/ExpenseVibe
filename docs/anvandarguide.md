@@ -251,11 +251,16 @@ för fler ändringar. Det sker bara när ingen tidrapport i perioden
 längre väntar på attestering. Behöver en rapporterad period rättas
 väljer du **Återöppna**.
 
-### Frånvaroinställningar
+### Inställningar
 
 Här styr du om lördagar, söndagar och helgdagar ska vara spärrade för
 frånvarorapportering. Spärren är på som standard. Svenska helgdagar
 räknas ut automatiskt och behöver inte läggas in.
+
+Här väljer du också om attestanter får attestera sina egna utlägg,
+kilometerrapporter och tidrapporter. Det är tillåtet som standard. Stänger
+du av det syns egna poster inte i attesteringskön, så någon annan
+attestant måste attestera dem.
 
 ### Export till Visma Lön 600
 

@@ -53,6 +53,17 @@ class Approvable(models.Model):
             return cls.objects.all()
         return cls.objects.filter(employee=user)
 
+    @classmethod
+    def pending_for(cls, user):
+        """Inskickade poster som `user` får besluta om - egna poster
+        utesluts om självattestering är avstängd i inställningarna."""
+        from absence.models import AbsenceSettings  # absence.models importerar core.models
+
+        qs = cls.objects.filter(status=ApprovalStatus.SUBMITTED)
+        if not AbsenceSettings.get_solo().allow_self_approval:
+            qs = qs.exclude(employee=user)
+        return qs
+
     @property
     def is_editable(self):
         return self.status in (ApprovalStatus.SUBMITTED, ApprovalStatus.REJECTED)

@@ -293,7 +293,7 @@ def absencesettings_edit(request):
             return redirect("absence:absencesettings_edit")
     else:
         form = AbsenceSettingsForm(instance=settings_obj)
-    return render(request, "absence/absencesettings_form.html", {"form": form, "title": "Frånvaroinställningar"})
+    return render(request, "absence/absencesettings_form.html", {"form": form, "title": "Inställningar"})
 
 
 @admin_required
