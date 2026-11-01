@@ -53,4 +53,6 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
           repository: ${{ env.IMAGE }}
+          # Relativa länkar i README (docs/, ios/, LICENSE) skrivs om till GitHub-URL:er.
+          enable-url-completion: true
           short-description: Utlägg, kilometerersättning och frånvaro med export till Visma Lön 600 (Django)
