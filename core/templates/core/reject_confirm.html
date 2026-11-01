@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% block title %}Avvisa – ExpenseVibe{% endblock %}
+{% block page_title %}Avvisa post{% endblock %}
+{% block nav_approval_queue %}active{% endblock %}
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-12 col-lg-6">
+    <div class="card shadow-sm">
+      <div class="card-body p-4">
+        <p>Du avvisar: <strong>{{ item }}</strong></p>
+        <form method="post">
+          {% csrf_token %}
+          <div class="mb-3">
+            <label class="form-label" for="reason">Anledning (obligatorisk)</label>
+            <textarea class="form-control" id="reason" name="reason" rows="3" required></textarea>
+          </div>
+          <div class="d-flex gap-2">
+            <button type="submit" class="btn btn-danger">Avvisa</button>
+            <a href="{% url 'core:approval_queue' %}" class="btn btn-outline-secondary">Avbryt</a>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,101 @@
+{% extends "base.html" %}
+{% block title %}Ny export – ExpenseVibe{% endblock %}
+{% block page_title %}Ny export till Visma Lön 600{% endblock %}
+{% block nav_export %}active{% endblock %}
+{% block content %}
+<form method="get" class="row g-2 align-items-end mb-4">
+  <div class="col-auto">
+    <label class="form-label small mb-0">Period från</label>
+    <input type="date" name="period_from" value="{{ period_from }}" class="form-control form-control-sm">
+  </div>
+  <div class="col-auto">
+    <label class="form-label small mb-0">Period till</label>
+    <input type="date" name="period_to" value="{{ period_to }}" class="form-control form-control-sm">
+  </div>
+  <div class="col-auto">
+    <button type="submit" class="btn btn-sm btn-outline-secondary">Filtrera</button>
+  </div>
+</form>
+
+<form method="post">
+  {% csrf_token %}
+  <input type="hidden" name="period_from" value="{{ period_from }}">
+  <input type="hidden" name="period_to" value="{{ period_to }}">
+
+  <h6 class="mb-2">Utlägg</h6>
+  <div class="card shadow-sm mb-4">
+    <div class="table-responsive">
+      <table class="table table-hover mb-0 align-middle">
+        <thead>
+          <tr><th></th><th>Anställd</th><th>Beskrivning</th><th>Datum</th><th>Belopp</th></tr>
+        </thead>
+        <tbody>
+          {% for expense in expenses %}
+          <tr>
+            <td><input type="checkbox" class="form-check-input" name="expense_ids" value="{{ expense.pk }}" checked></td>
+            <td>{{ expense.employee.get_full_name|default:expense.employee.email }}</td>
+            <td>{{ expense.description }}</td>
+            <td>{{ expense.expense_date }}</td>
+            <td>{{ expense.amount }} {{ expense.currency }}</td>
+          </tr>
+          {% empty %}
+          <tr><td colspan="5" class="empty-state">Inga attesterade utlägg väntar på export.</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <h6 class="mb-2">Kilometerrapporter</h6>
+  <div class="card shadow-sm mb-4">
+    <div class="table-responsive">
+      <table class="table table-hover mb-0 align-middle">
+        <thead>
+          <tr><th></th><th>Anställd</th><th>Sträcka</th><th>Datum</th><th>Belopp</th></tr>
+        </thead>
+        <tbody>
+          {% for report in mileage_reports %}
+          <tr>
+            <td><input type="checkbox" class="form-check-input" name="mileage_ids" value="{{ report.pk }}" checked></td>
+            <td>{{ report.employee.get_full_name|default:report.employee.email }}</td>
+            <td>{{ report.start_location }} → {{ report.end_location }}</td>
+            <td>{{ report.date }}</td>
+            <td>{{ report.compensation_amount }} SEK</td>
+          </tr>
+          {% empty %}
+          <tr><td colspan="5" class="empty-state">Inga attesterade kilometerrapporter väntar på export.</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <h6 class="mb-2">Frånvaro</h6>
+  <div class="card shadow-sm mb-4">
+    <div class="table-responsive">
+      <table class="table table-hover mb-0 align-middle">
+        <thead>
+          <tr><th></th><th>Period</th><th>Attesterade tidrapporter</th></tr>
+        </thead>
+        <tbody>
+          {% for period in periods %}
+          <tr>
+            <td><input type="checkbox" class="form-check-input" name="period_ids" value="{{ period.pk }}" checked></td>
+            <td>{{ period }}</td>
+            <td>{{ period.pending_time_report_count }}</td>
+          </tr>
+          {% empty %}
+          <tr><td colspan="3" class="empty-state">Inga perioder med attesterade tidrapporter väntar på export.</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    <div class="card-body py-2 text-muted small border-top">
+      Att välja en period exporterar alla dess attesterade tidrapporter och stänger perioden för
+      vidare rapportering, om inga fler tidrapporter väntar på attestering i den.
+    </div>
+  </div>
+
+  <button type="submit" class="btn btn-primary"><i class="bi bi-file-earmark-arrow-down"></i> Skapa export</button>
+</form>
+{% endblock %}

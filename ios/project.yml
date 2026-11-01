@@ -1,0 +1,48 @@
+# Xcode-projektet genereras härifrån: `xcodegen generate` (brew install xcodegen).
+# ExpenseVibe.xcodeproj är ett byggartefakt och ligger i .gitignore.
+name: ExpenseVibe
+options:
+  bundleIdPrefix: se.damadev
+  deploymentTarget:
+    iOS: "17.0"
+  createIntermediateGroups: true
+targets:
+  ExpenseVibe:
+    type: application
+    platform: iOS
+    sources: [ExpenseVibe]
+    info:
+      path: ExpenseVibe/Info.plist
+      properties:
+        CFBundleDisplayName: ExpenseVibe
+        UILaunchScreen: {}
+        UISupportedInterfaceOrientations: [UIInterfaceOrientationPortrait]
+        CFBundleURLTypes:
+          - CFBundleURLName: se.damadev.expensevibe
+            CFBundleURLSchemes: [expensevibe]
+        # Gör att appen syns i delningsmenyn för PDF:er och bilder (t.ex.
+        # bilagor i Mail); filen kommer in via onOpenURL och blir ett nytt utlägg.
+        CFBundleDocumentTypes:
+          - CFBundleTypeName: Kvitto
+            LSHandlerRank: Alternate
+            LSItemContentTypes: [com.adobe.pdf, public.image]
+        LSSupportsOpeningDocumentsInPlace: false
+        NSCameraUsageDescription: Fotografera kvitton och skanna QR-koden för inloggning.
+        NSPhotoLibraryUsageDescription: Välj kvittobilder ur bildbiblioteket.
+        # Tillåter http mot servrar på det lokala nätet (utveckling). En
+        # riktig server ska köra https - då behövs inget undantag.
+        # Bara https/standardkrypto - slipper exportfrågan vid varje TestFlight-bygge.
+        ITSAppUsesNonExemptEncryption: false
+        # Byggnumret överstyrs vid uppladdning: CURRENT_PROJECT_VERSION=$(date +%Y%m%d%H%M)
+        CFBundleVersion: $(CURRENT_PROJECT_VERSION)
+        NSAppTransportSecurity:
+          NSAllowsLocalNetworking: true
+    settings:
+      base:
+        SWIFT_VERSION: "5.0"
+        TARGETED_DEVICE_FAMILY: "1"
+        ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
+        GENERATE_INFOPLIST_FILE: false
+        CODE_SIGN_STYLE: Automatic
+        DEVELOPMENT_TEAM: 7MV2FUVY65
+        CURRENT_PROJECT_VERSION: "1"

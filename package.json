@@ -1,0 +1,11 @@
+{
+  "name": "expensevibe",
+  "private": true,
+  "version": "1.0.0",
+  "description": "ExpenseVibe frontend asset dependencies",
+  "license": "MIT",
+  "dependencies": {
+    "bootstrap": "5.3.8",
+    "bootstrap-icons": "1.13.2"
+  }
+}

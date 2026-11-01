@@ -1,0 +1,115 @@
+{% extends "base.html" %}
+{% block title %}Attesteringskö – ExpenseVibe{% endblock %}
+{% block page_title %}Attesteringskö{% endblock %}
+{% block nav_approval_queue %}active{% endblock %}
+{% block content %}
+<h6 class="mb-2">Utlägg</h6>
+<div class="card shadow-sm mb-4">
+  <div class="table-responsive">
+    <table class="table table-hover mb-0 align-middle">
+      <thead>
+        <tr>
+          <th>Anställd</th>
+          <th>Beskrivning</th>
+          <th>Kategori</th>
+          <th>Datum</th>
+          <th>Belopp</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for expense in expenses %}
+        <tr>
+          <td>{{ expense.employee.get_full_name|default:expense.employee.email }}</td>
+          <td><a href="{% url 'expenses:expense_detail' expense.pk %}">{{ expense.description }}</a></td>
+          <td>{{ expense.category }}</td>
+          <td>{{ expense.expense_date }}</td>
+          <td>{{ expense.amount }} {{ expense.currency }}</td>
+          <td class="text-end">
+            <form method="post" action="{% url 'core:approve_item' 'utlagg' expense.pk %}" class="d-inline">
+              {% csrf_token %}
+              <button type="submit" class="btn btn-sm btn-success"><i class="bi bi-check-lg"></i> Attestera</button>
+            </form>
+            <a href="{% url 'core:reject_item' 'utlagg' expense.pk %}" class="btn btn-sm btn-outline-danger"><i class="bi bi-x-lg"></i> Avvisa</a>
+          </td>
+        </tr>
+        {% empty %}
+        <tr><td colspan="6" class="empty-state"><i class="bi bi-check2-circle d-block mb-2"></i>Inga utlägg väntar på attestering.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<h6 class="mb-2">Kilometerrapporter</h6>
+<div class="card shadow-sm">
+  <div class="table-responsive">
+    <table class="table table-hover mb-0 align-middle">
+      <thead>
+        <tr>
+          <th>Anställd</th>
+          <th>Sträcka</th>
+          <th>Syfte</th>
+          <th>Datum</th>
+          <th>Belopp</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for report in mileage_reports %}
+        <tr>
+          <td>{{ report.employee.get_full_name|default:report.employee.email }}</td>
+          <td><a href="{% url 'mileage:mileagereport_detail' report.pk %}">{{ report.start_location }} → {{ report.end_location }}</a></td>
+          <td>{{ report.purpose }}</td>
+          <td>{{ report.date }}</td>
+          <td>{{ report.compensation_amount }} SEK</td>
+          <td class="text-end">
+            <form method="post" action="{% url 'core:approve_item' 'kilometer' report.pk %}" class="d-inline">
+              {% csrf_token %}
+              <button type="submit" class="btn btn-sm btn-success"><i class="bi bi-check-lg"></i> Attestera</button>
+            </form>
+            <a href="{% url 'core:reject_item' 'kilometer' report.pk %}" class="btn btn-sm btn-outline-danger"><i class="bi bi-x-lg"></i> Avvisa</a>
+          </td>
+        </tr>
+        {% empty %}
+        <tr><td colspan="6" class="empty-state"><i class="bi bi-check2-circle d-block mb-2"></i>Inga kilometerrapporter väntar på attestering.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<h6 class="mb-2">Tidrapporter</h6>
+<div class="card shadow-sm">
+  <div class="table-responsive">
+    <table class="table table-hover mb-0 align-middle">
+      <thead>
+        <tr>
+          <th>Anställd</th>
+          <th>Period</th>
+          <th>Inskickad</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for report in time_reports %}
+        <tr>
+          <td>{{ report.employee.get_full_name|default:report.employee.email }}</td>
+          <td><a href="{% url 'absence:timereport_detail' report.pk %}">{{ report.period }}</a></td>
+          <td>{{ report.submitted_at }}</td>
+          <td class="text-end">
+            <form method="post" action="{% url 'core:approve_item' 'tidrapport' report.pk %}" class="d-inline">
+              {% csrf_token %}
+              <button type="submit" class="btn btn-sm btn-success"><i class="bi bi-check-lg"></i> Attestera</button>
+            </form>
+            <a href="{% url 'core:reject_item' 'tidrapport' report.pk %}" class="btn btn-sm btn-outline-danger"><i class="bi bi-x-lg"></i> Avvisa</a>
+          </td>
+        </tr>
+        {% empty %}
+        <tr><td colspan="4" class="empty-state"><i class="bi bi-check2-circle d-block mb-2"></i>Inga tidrapporter väntar på attestering.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

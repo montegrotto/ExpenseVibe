@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+{% block title %}Ta bort frånvaropost – ExpenseVibe{% endblock %}
+{% block page_title %}Ta bort frånvaropost{% endblock %}
+{% block nav_absence_calendar %}active{% endblock %}
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-12 col-lg-6">
+    <div class="card shadow-sm">
+      <div class="card-body p-4">
+        <p>Ta bort frånvaroposten <strong>{{ entry.date }} – {{ entry.absence_type }}</strong>?</p>
+        <form method="post">
+          {% csrf_token %}
+          <div class="d-flex gap-2">
+            <button type="submit" class="btn btn-danger">Ta bort</button>
+            <a href="{% url 'absence:absenceentry_edit' entry.pk %}" class="btn btn-outline-secondary">Avbryt</a>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

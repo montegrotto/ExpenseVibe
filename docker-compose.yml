@@ -1,0 +1,84 @@
+services:
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    env_file:
+      - .env
+    environment:
+      DJANGO_DEBUG: "0"
+      # Fast till reinvgrabber-tjänsten nedan (samma compose-nätverk) - se
+      # attachments/extraction_client.py: en tom URL stänger av
+      # integrationen helt.
+      REINVGRABBER_URL: http://reinvgrabber:5001
+    volumes:
+      - expensevibe-data:/data
+      - static-assets:/app/staticfiles
+      - media-assets:/data/media
+    depends_on:
+      db:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "python3", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/konto/logga-in/', timeout=3)"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+      # web kör migrate och kopierar in statiska filer i entrypointen innan
+      # gunicorn ens startar - på en långsam disk (t.ex. Docker Desktop på
+      # macOS med volymer) kan det ta längre än interval*retries. Fel under
+      # start_period räknas inte mot retries, bara sådana EFTER den, så en
+      # långsam men fungerande uppstart hinner bli klar istället för att
+      # markeras unhealthy i onödan.
+      start_period: 40s
+    expose:
+      - "8000"
+    restart: unless-stopped
+
+  # Separat program (eget repo, egen Python-version) som föreslår
+  # bokförings-/betalningsfält ur uppladdade bilagor med lokal OCR - se
+  # attachments/extraction_client.py för varför den INTE körs i samma
+  # process som web.
+  reinvgrabber:
+    image: montegrotto/reinvgrabber:0.1
+    healthcheck:
+      test: ["CMD", "python3", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:5001/health', timeout=3)"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 20s
+    expose:
+      - "5001"
+    restart: unless-stopped
+
+  db:
+    image: postgres:17-alpine
+    env_file:
+      - .env
+    volumes:
+      - expensevibe-postgres:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U expensevibe -d expensevibe"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+      start_period: 15s
+    restart: unless-stopped
+
+  nginx:
+    image: nginx:1.27-alpine
+    depends_on:
+      web:
+        condition: service_healthy
+    ports:
+      - "${NGINX_HTTP_PORT:-80}:80"
+    volumes:
+      - ./nginx/default.conf:/etc/nginx/conf.d/default.conf:ro
+      - static-assets:/static:ro
+      - media-assets:/media:ro
+    restart: unless-stopped
+
+volumes:
+  expensevibe-data:
+  expensevibe-postgres:
+  static-assets:
+  media-assets:

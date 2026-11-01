@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+{% block title %}Km-satser – ExpenseVibe{% endblock %}
+{% block page_title %}Km-satser{% endblock %}
+{% block nav_mileagerates %}active{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <h5 class="mb-0">Km-satser</h5>
+  <a href="{% url 'mileage:mileagerate_create' %}" class="btn btn-primary"><i class="bi bi-plus-lg"></i> Ny km-sats</a>
+</div>
+<p class="text-muted small">Vid ändring läggs en ny rad till med "gäller från"-datum - befintliga rader redigeras aldrig, så att redan inlämnade kilometerrapporter behåller den sats de faktiskt beräknades med.</p>
+<div class="card shadow-sm">
+  <div class="table-responsive">
+    <table class="table table-hover mb-0 align-middle">
+      <thead>
+        <tr><th>Kr/km</th><th>Kod (löneart)</th><th>Benämning</th><th>Gäller från</th></tr>
+      </thead>
+      <tbody>
+        {% for rate in rates %}
+        <tr>
+          <td>{{ rate.amount_per_km }}</td>
+          <td>
+            {% if rate.export_code %}{{ rate.export_code }}{% else %}
+            <span class="text-danger small"><i class="bi bi-exclamation-triangle"></i> Ingen kod satt</span>
+            {% endif %}
+          </td>
+          <td>{{ rate.export_code_name }}</td>
+          <td>{{ rate.valid_from }}</td>
+        </tr>
+        {% empty %}
+        <tr><td colspan="4" class="empty-state"><i class="bi bi-cash-coin d-block mb-2"></i>Ingen km-sats är konfigurerad ännu.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

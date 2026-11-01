@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% block title %}Bilageinkorg – ExpenseVibe{% endblock %}
+{% block page_title %}Bilageinkorg{% endblock %}
+{% block nav_inbox %}active{% endblock %}
+{% block content %}
+<p class="text-muted">Uppladdade bilagor som ännu inte kopplats till ett utlägg.</p>
+<div class="row g-3">
+  {% for attachment in attachments %}
+  <div class="col-6 col-md-4 col-lg-3">
+    <div class="card shadow-sm h-100">
+      {% if attachment.thumbnail %}
+      <img src="{% url 'attachments:thumbnail' attachment.pk %}" class="card-img-top" alt="">
+      {% else %}
+      <div class="card-img-top d-flex align-items-center justify-content-center bg-light" style="height:140px;">
+        <i class="bi bi-file-earmark-text" style="font-size:2rem;" aria-hidden="true"></i>
+      </div>
+      {% endif %}
+      <div class="card-body">
+        <p class="card-text small text-truncate mb-2">{{ attachment.file_name }}</p>
+        <div class="d-flex gap-2">
+          <a href="{% url 'expenses:expense_create' %}?attachment_id={{ attachment.pk }}" class="btn btn-sm btn-primary">Skapa utlägg</a>
+          <a href="{% url 'attachments:delete' attachment.pk %}" class="btn btn-sm btn-outline-danger"><i class="bi bi-trash"></i></a>
+        </div>
+      </div>
+    </div>
+  </div>
+  {% empty %}
+  <div class="col-12">
+    <div class="empty-state"><i class="bi bi-inbox d-block mb-2"></i>Inkorgen är tom.</div>
+  </div>
+  {% endfor %}
+</div>
+{% endblock %}

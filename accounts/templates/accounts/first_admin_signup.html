@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+{% block title %}Skapa administratörskonto – ExpenseVibe{% endblock %}
+{% block content_unauth %}
+<div class="row justify-content-center mt-5">
+  <div class="col-11 col-sm-8 col-md-6 col-lg-5">
+    <div class="text-center mb-4">
+      <i class="bi bi-wallet2" style="font-size:2.2rem;"></i>
+      <h4 class="mt-2 mb-0">ExpenseVibe</h4>
+      <p class="text-muted">Systemet har ingen användare ännu – skapa det första kontot. Det blir automatiskt administratör.</p>
+    </div>
+    <div class="card shadow-sm">
+      <div class="card-body p-4">
+        <form method="post">
+          {% csrf_token %}
+          {% if form.non_field_errors %}<div class="alert alert-danger">{{ form.non_field_errors }}</div>{% endif %}
+          {% for field in form %}
+          <div class="mb-3">
+            <label class="form-label" for="{{ field.id_for_label }}">{{ field.label }}</label>
+            {{ field }}
+            {% if field.errors %}<div class="text-danger small">{{ field.errors }}</div>{% endif %}
+          </div>
+          {% endfor %}
+          <button type="submit" class="btn btn-primary w-100">Skapa administratörskonto</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

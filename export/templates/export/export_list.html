@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+{% block title %}Exporter – ExpenseVibe{% endblock %}
+{% block page_title %}Export till Visma Lön 600{% endblock %}
+{% block nav_export %}active{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <h5 class="mb-0">Tidigare exporter</h5>
+  <a href="{% url 'export:export_create' %}" class="btn btn-primary"><i class="bi bi-plus-lg"></i> Ny export</a>
+</div>
+<div class="card shadow-sm">
+  <div class="table-responsive">
+    <table class="table table-hover mb-0 align-middle">
+      <thead>
+        <tr><th>Skapad</th><th>Skapad av</th><th>Utlägg</th><th>Km-rapporter</th><th>Tidrapporter</th><th>Totalbelopp</th><th></th></tr>
+      </thead>
+      <tbody>
+        {% for batch in batches %}
+        <tr>
+          <td>{{ batch.created_at }}</td>
+          <td>{{ batch.created_by }}</td>
+          <td>{{ batch.expense_count }}</td>
+          <td>{{ batch.mileage_count }}</td>
+          <td>{{ batch.time_report_count }}</td>
+          <td>{{ batch.total_amount }} SEK</td>
+          <td class="text-end">
+            {% if batch.file %}
+            <a href="{% url 'export:export_download' batch.pk %}" class="btn btn-sm btn-outline-secondary"><i class="bi bi-download"></i> Hämta .tlu</a>
+            {% endif %}
+          </td>
+        </tr>
+        {% empty %}
+        <tr><td colspan="7" class="empty-state"><i class="bi bi-file-earmark-arrow-down d-block mb-2"></i>Inga exporter ännu.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

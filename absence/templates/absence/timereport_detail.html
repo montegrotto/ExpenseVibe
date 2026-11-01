@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+{% block title %}Tidrapport – ExpenseVibe{% endblock %}
+{% block page_title %}Tidrapport{% endblock %}
+{% block nav_timereport_list %}active{% endblock %}
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-12 col-lg-8">
+    <div class="card shadow-sm">
+      <div class="card-body">
+        <div class="d-flex justify-content-between align-items-start mb-3">
+          <h5 class="mb-0">{{ report.employee.get_full_name|default:report.employee.email }} – {{ report.period }}</h5>
+          {% if report.status == "submitted" %}<span class="badge text-bg-warning">Inskickad</span>
+          {% elif report.status == "approved" %}<span class="badge text-bg-success">Attesterad</span>
+          {% elif report.status == "rejected" %}<span class="badge text-bg-danger">Avvisad</span>
+          {% elif report.status == "exported" %}<span class="badge text-bg-secondary">Exporterad</span>
+          {% endif %}
+        </div>
+        <dl class="row">
+          <dt class="col-4">Inskickad</dt><dd class="col-8">{{ report.submitted_at }}</dd>
+          {% if report.decided_at %}
+          <dt class="col-4">Beslutad av</dt><dd class="col-8">{{ report.decided_by }} ({{ report.decided_at }})</dd>
+          {% endif %}
+          {% if report.decision_comment %}
+          <dt class="col-4">Kommentar</dt><dd class="col-8">{{ report.decision_comment }}</dd>
+          {% endif %}
+        </dl>
+        <h6 class="mt-4 mb-2">Frånvaroposter</h6>
+        <div class="table-responsive">
+          <table class="table table-sm table-hover mb-0 align-middle">
+            <thead>
+              <tr><th>Datum</th><th>Frånvaroart</th><th>Timmar</th></tr>
+            </thead>
+            <tbody>
+              {% for entry in entries %}
+              <tr>
+                <td>{{ entry.date }}</td>
+                <td>{{ entry.absence_type.name }}</td>
+                <td>{{ entry.effective_hours|default:"Hel dag" }}</td>
+              </tr>
+              {% empty %}
+              <tr><td colspan="3" class="empty-state">Inga frånvaroposter i denna period.</td></tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

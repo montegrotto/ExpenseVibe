@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}Nytt utlägg – ExpenseVibe{% endblock %}
+{% block page_title %}Nytt utlägg{% endblock %}
+{% block nav_expense_upload %}active{% endblock %}
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-12 col-lg-6">
+    <div class="card shadow-sm">
+      <div class="card-body p-4">
+        <h6 class="mb-1">Steg 1 av 2 – Ladda upp kvitto eller faktura</h6>
+        <p class="text-muted">PDF, PNG eller JPG. Kategori och belopp fyller du i på nästa steg.</p>
+        <form method="post" enctype="multipart/form-data" id="attachment-upload-form">
+          {% csrf_token %}
+          <div class="mb-3">
+            {{ form.file }}
+            {% if form.file.errors %}<div class="text-danger small">{{ form.file.errors }}</div>{% endif %}
+          </div>
+          <div id="attachment-upload-progress" class="progress mb-3 d-none" role="progressbar" aria-label="Laddar upp" style="height: 6px;">
+            <div class="progress-bar progress-bar-striped progress-bar-animated" style="width: 100%"></div>
+          </div>
+          <button type="submit" class="btn btn-primary" id="attachment-upload-submit">
+            <span id="attachment-upload-submit-label"><i class="bi bi-upload"></i> Ladda upp</span>
+            <span id="attachment-upload-loading" class="d-none">
+              <span class="spinner-border spinner-border-sm me-1" role="status" aria-hidden="true"></span>Laddar upp, vänta...
+            </span>
+          </button>
+        </form>
+      </div>
+    </div>
+    <p class="text-muted mt-3">
+      Har du redan laddat upp kvitton som väntar på att bli utlägg? Se din
+      <a href="{% url 'attachments:inbox' %}">bilageinkorg</a>.
+    </p>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+{{ block.super }}
+<script src="{% static 'js/attachment-upload.js' %}"></script>
+<script>
+  ExpenseVibe.attachments.initUploadLoadingState({
+    form: 'attachment-upload-form',
+    submitBtn: 'attachment-upload-submit',
+    label: 'attachment-upload-submit-label',
+    loading: 'attachment-upload-loading',
+    progress: 'attachment-upload-progress'
+  });
+</script>
+{% endblock %}

@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% block title %}Ta bort bilaga – ExpenseVibe{% endblock %}
+{% block page_title %}Ta bort bilaga{% endblock %}
+{% block nav_inbox %}active{% endblock %}
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-12 col-lg-6">
+    <div class="card shadow-sm">
+      <div class="card-body p-4">
+        <p>Ta bort <strong>{{ attachment.file_name }}</strong>?</p>
+        <form method="post">
+          {% csrf_token %}
+          <div class="mb-3">
+            <label for="id_reason" class="form-label">Orsak (valfritt)</label>
+            <input type="text" name="reason" id="id_reason" class="form-control" maxlength="255">
+          </div>
+          <div class="d-flex gap-2">
+            <button type="submit" class="btn btn-danger">Ta bort</button>
+            <a href="{% url 'attachments:inbox' %}" class="btn btn-outline-secondary">Avbryt</a>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

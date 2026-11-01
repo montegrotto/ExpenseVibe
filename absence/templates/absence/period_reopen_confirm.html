@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+{% block title %}Återöppna period – ExpenseVibe{% endblock %}
+{% block page_title %}Återöppna period{% endblock %}
+{% block nav_periods %}active{% endblock %}
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-12 col-lg-6">
+    <div class="card shadow-sm">
+      <div class="card-body p-4">
+        <p>Återöppna perioden <strong>{{ period }}</strong>? Den blir då redovisningsbar igen (t.ex. om en
+        avvisad tidrapport behöver rättas och skickas in på nytt efter att perioden redan rapporterats).
+        Redan exporterade tidrapporter påverkas inte.</p>
+        <form method="post">
+          {% csrf_token %}
+          <div class="d-flex gap-2">
+            <button type="submit" class="btn btn-primary">Återöppna</button>
+            <a href="{% url 'absence:period_list' %}" class="btn btn-outline-secondary">Avbryt</a>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+{% block title %}Logga in – ExpenseVibe{% endblock %}
+{% block content_unauth %}
+<div class="row justify-content-center mt-5">
+  <div class="col-11 col-sm-7 col-md-5 col-lg-4">
+    <div class="text-center mb-4">
+      <i class="bi bi-wallet2" style="font-size:2.2rem;"></i>
+      <h4 class="mt-2 mb-0">ExpenseVibe</h4>
+      <p class="text-muted">Logga in för att fortsätta</p>
+    </div>
+    <div class="card shadow-sm">
+      <div class="card-body p-4">
+        <form method="post">
+          {% csrf_token %}
+          {% if form.non_field_errors %}
+            <div class="alert alert-danger">{{ form.non_field_errors }}</div>
+          {% endif %}
+          <div class="mb-3">
+            <label class="form-label" for="{{ form.username.id_for_label }}">E-post</label>
+            {{ form.username }}
+          </div>
+          <div class="mb-3">
+            <label class="form-label" for="{{ form.password.id_for_label }}">Lösenord</label>
+            {{ form.password }}
+          </div>
+          <button type="submit" class="btn btn-primary w-100">Logga in</button>
+        </form>
+      </div>
+    </div>
+    {% if no_users_yet %}
+    <div class="alert alert-info mt-3 mb-0 text-center">
+      Ingen användare finns ännu.
+      <a href="{% url 'accounts:first_admin_signup' %}">Skapa det första kontot</a> – det blir administratör.
+    </div>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

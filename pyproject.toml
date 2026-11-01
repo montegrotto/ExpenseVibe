@@ -1,0 +1,35 @@
+[tool.ruff]
+line-length = 120
+target-version = "py313"
+extend-exclude = [
+    "*/migrations/*",
+    ".venv",
+    "node_modules",
+    "staticfiles",
+]
+
+[tool.ruff.lint]
+select = [
+    "E4", # imports
+    "E7", # statement style
+    "E9", # syntax errors
+    "F",  # pyflakes
+    "I",  # import sorting
+]
+
+[tool.ruff.lint.per-file-ignores]
+"**/tests.py" = ["F841"]
+"**/tests/*" = ["F841"]
+
+[tool.ruff.lint.isort]
+known-first-party = [
+    "absence",
+    "accounts",
+    "api",
+    "attachments",
+    "core",
+    "expenses",
+    "export",
+    "mileage",
+    "expensevibe",
+]

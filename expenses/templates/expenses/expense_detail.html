@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+{% block title %}{{ expense.description }} – ExpenseVibe{% endblock %}
+{% block page_title %}Utlägg{% endblock %}
+{% block nav_expense_list %}active{% endblock %}
+{% block content %}
+<div class="row g-3">
+  <div class="col-12 col-lg-5">
+    <div class="card shadow-sm">
+      <div class="card-header bg-white">Bilaga</div>
+      <div class="card-body">
+        {% if expense.attachment.thumbnail %}
+        <img src="{% url 'attachments:thumbnail' expense.attachment.pk %}" class="img-fluid rounded border mb-2" alt="">
+        {% endif %}
+        <a href="{% url 'attachments:file' expense.attachment.pk %}" target="_blank" rel="noopener" class="d-block small">{{ expense.attachment.file_name }}</a>
+      </div>
+    </div>
+  </div>
+  <div class="col-12 col-lg-7">
+    <div class="card shadow-sm">
+      <div class="card-body">
+        <div class="d-flex justify-content-between align-items-start mb-3">
+          <h5 class="mb-0">{{ expense.description }}</h5>
+          {% if expense.status == "submitted" %}<span class="badge text-bg-warning">Inskickad</span>
+          {% elif expense.status == "approved" %}<span class="badge text-bg-success">Attesterad</span>
+          {% elif expense.status == "rejected" %}<span class="badge text-bg-danger">Avvisad</span>
+          {% elif expense.status == "exported" %}<span class="badge text-bg-secondary">Exporterad</span>
+          {% endif %}
+        </div>
+        <dl class="row">
+          <dt class="col-4">Anställd</dt><dd class="col-8">{{ expense.employee.get_full_name|default:expense.employee.email }}</dd>
+          <dt class="col-4">Kategori</dt><dd class="col-8">{{ expense.category }}</dd>
+          <dt class="col-4">Datum</dt><dd class="col-8">{{ expense.expense_date }}</dd>
+          <dt class="col-4">Belopp</dt><dd class="col-8">{{ expense.amount }} {{ expense.currency }}</dd>
+          {% if expense.vat_amount %}<dt class="col-4">Varav moms</dt><dd class="col-8">{{ expense.vat_amount }}</dd>{% endif %}
+          <dt class="col-4">Inskickad</dt><dd class="col-8">{{ expense.submitted_at }}</dd>
+          {% if expense.decided_at %}
+          <dt class="col-4">Beslutad av</dt><dd class="col-8">{{ expense.decided_by }} ({{ expense.decided_at }})</dd>
+          {% endif %}
+          {% if expense.decision_comment %}
+          <dt class="col-4">Kommentar</dt><dd class="col-8">{{ expense.decision_comment }}</dd>
+          {% endif %}
+        </dl>
+        {% if expense.employee == user and expense.is_editable %}
+        <div class="d-flex gap-2 mt-3">
+          <a href="{% url 'expenses:expense_edit' expense.pk %}" class="btn btn-outline-secondary">Redigera</a>
+          <a href="{% url 'expenses:expense_delete' expense.pk %}" class="btn btn-outline-danger">Ta bort</a>
+        </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

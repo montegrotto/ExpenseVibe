@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+{% block title %}{{ title }} – ExpenseVibe{% endblock %}
+{% block page_title %}{{ title }}{% endblock %}
+{% block nav_absencesettings %}active{% endblock %}
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-12 col-lg-6">
+    <div class="card shadow-sm">
+      <div class="card-body p-4">
+        <p class="text-muted small">Timmar per arbetsdag (för att räkna om Hel dag-frånvaro till timmar i
+        Visma-exporten, och som tak för timbaserade frånvaroposter) styrs numera per anställd - se
+        <a href="{% url 'absence:workschedule_list' %}">Arbetsscheman</a>.</p>
+        <form method="post">
+          {% csrf_token %}
+          {% for field in form %}
+            {% if field.field.widget.input_type == "checkbox" %}
+            <div class="form-check mb-3">
+              {{ field }}
+              <label class="form-check-label" for="{{ field.id_for_label }}">{{ field.label }}</label>
+              {% if field.errors %}<div class="text-danger small">{{ field.errors }}</div>{% endif %}
+            </div>
+            {% else %}
+            <div class="mb-3">
+              <label class="form-label" for="{{ field.id_for_label }}">{{ field.label }}</label>
+              {{ field }}
+              {% if field.errors %}<div class="text-danger small">{{ field.errors }}</div>{% endif %}
+            </div>
+            {% endif %}
+          {% endfor %}
+          <div class="d-flex gap-2">
+            <button type="submit" class="btn btn-primary">Spara</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

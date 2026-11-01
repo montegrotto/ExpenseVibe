@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+{% block title %}Kategorier – ExpenseVibe{% endblock %}
+{% block page_title %}Kategorier{% endblock %}
+{% block nav_categories %}active{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <h5 class="mb-0">Kategorier</h5>
+  <a href="{% url 'expenses:category_create' %}" class="btn btn-primary"><i class="bi bi-plus-lg"></i> Ny kategori</a>
+</div>
+<div class="card shadow-sm">
+  <div class="table-responsive">
+    <table class="table table-hover mb-0 align-middle">
+      <thead>
+        <tr><th>Namn</th><th>Kod (löneart)</th><th>Aktiv</th><th></th></tr>
+      </thead>
+      <tbody>
+        {% for category in categories %}
+        <tr>
+          <td>{{ category.name }}</td>
+          <td>
+            {% if category.code %}{{ category.code }}{% else %}
+            <span class="text-danger small"><i class="bi bi-exclamation-triangle"></i> Ingen kod satt – kan inte exporteras korrekt</span>
+            {% endif %}
+          </td>
+          <td>{% if category.is_active %}<span class="badge text-bg-success">Aktiv</span>{% else %}<span class="badge text-bg-secondary">Inaktiv</span>{% endif %}</td>
+          <td class="text-end">
+            <a href="{% url 'expenses:category_edit' category.pk %}" class="btn btn-sm btn-outline-secondary">Redigera</a>
+            <a href="{% url 'expenses:category_delete' category.pk %}" class="btn btn-sm btn-outline-danger">Ta bort</a>
+          </td>
+        </tr>
+        {% empty %}
+        <tr><td colspan="4" class="empty-state"><i class="bi bi-tags d-block mb-2"></i>Inga kategorier ännu.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

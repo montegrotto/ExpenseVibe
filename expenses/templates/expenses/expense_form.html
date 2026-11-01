@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+{% block title %}{{ title }} – ExpenseVibe{% endblock %}
+{% block page_title %}{{ title }}{% endblock %}
+{% block nav_expense_list %}{% if expense %}active{% endif %}{% endblock %}
+{% block nav_expense_upload %}{% if not expense %}active{% endif %}{% endblock %}
+{% block content %}
+<div class="row g-3">
+  <div class="col-12 col-lg-5">
+    <div class="card shadow-sm">
+      <div class="card-header bg-white">Steg 2 av 2 – Bilaga</div>
+      <div class="card-body">
+        {% if attachment.thumbnail %}
+        <img src="{% url 'attachments:thumbnail' attachment.pk %}" class="img-fluid rounded border mb-3" alt="Förhandsgranskning">
+        {% endif %}
+        <p class="small text-muted mb-3">{{ attachment.file_name }}</p>
+        {% if not attachment.extracted_data %}
+        <div class="alert alert-warning small mb-0">
+          <i class="bi bi-exclamation-triangle"></i> OCR-tolkning saknas eller är osäker – kontrollera fälten manuellt.
+        </div>
+        {% else %}
+        <dl class="row small mb-0">
+          {% if attachment.extracted_data.leverantör %}<dt class="col-5">Leverantör</dt><dd class="col-7">{{ attachment.extracted_data.leverantör }}</dd>{% endif %}
+          {% if attachment.extracted_data.momsbelopp %}<dt class="col-5">Moms</dt><dd class="col-7">{{ attachment.extracted_data.momsbelopp }}</dd>{% endif %}
+          {% if attachment.extracted_data.fakturanummer %}<dt class="col-5">Fakturanummer</dt><dd class="col-7">{{ attachment.extracted_data.fakturanummer }}</dd>{% endif %}
+          {% if attachment.extracted_data.anmärkningar %}<dt class="col-5">Anmärkningar</dt><dd class="col-7">{{ attachment.extracted_data.anmärkningar }}</dd>{% endif %}
+        </dl>
+        {% if needs_review %}
+        <div class="alert alert-warning small mt-3 mb-0">
+          <i class="bi bi-exclamation-triangle"></i> Tolkningen flaggades för granskning – kontrollera fälten.
+        </div>
+        {% endif %}
+        {% endif %}
+      </div>
+    </div>
+  </div>
+  <div class="col-12 col-lg-7">
+    <div class="card shadow-sm">
+      <div class="card-body p-4">
+        <form method="post">
+          {% csrf_token %}
+          {% if attachment %}<input type="hidden" name="attachment_id" value="{{ attachment.pk }}">{% endif %}
+          {% for field in form %}
+          <div class="mb-3">
+            <label class="form-label" for="{{ field.id_for_label }}">{{ field.label }}</label>
+            {{ field }}
+            {% if field.errors %}<div class="text-danger small">{{ field.errors }}</div>{% endif %}
+          </div>
+          {% endfor %}
+          <div class="d-flex gap-2">
+            <button type="submit" class="btn btn-primary">Skicka in</button>
+            <a href="{% url 'expenses:expense_list' %}" class="btn btn-outline-secondary">Avbryt</a>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,8 @@
+# GitHub Pages bygger den här mappen med Jekyll. Markdown utan front matter
+# renderas ändå (jekyll-optional-front-matter är på som standard).
+title: ExpenseVibe
+description: Utlägg, kilometerersättning och frånvaro med export till Visma Lön 600
+lang: sv
+theme: jekyll-theme-minimal
+logo: icon.png
+show_downloads: false

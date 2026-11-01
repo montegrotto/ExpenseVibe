@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+{% block title %}Mina utlägg – ExpenseVibe{% endblock %}
+{% block page_title %}Utlägg{% endblock %}
+{% block nav_expense_list %}active{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <h5 class="mb-0">{% if user.is_admin or user.is_approver %}Alla utlägg{% else %}Mina utlägg{% endif %}</h5>
+  <a href="{% url 'attachments:upload' %}" class="btn btn-primary"><i class="bi bi-plus-lg"></i> Nytt utlägg</a>
+</div>
+<div class="card shadow-sm">
+  <div class="table-responsive">
+    <table class="table table-hover mb-0 align-middle">
+      <thead>
+        <tr>
+          {% if user.is_admin or user.is_approver %}<th>Anställd</th>{% endif %}
+          <th>Beskrivning</th>
+          <th>Kategori</th>
+          <th>Datum</th>
+          <th>Belopp</th>
+          <th>Status</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for expense in expenses %}
+        <tr class="cursor-pointer" onclick="window.location='{% url 'expenses:expense_detail' expense.pk %}'" style="cursor:pointer;">
+          {% if user.is_admin or user.is_approver %}<td>{{ expense.employee.get_full_name|default:expense.employee.email }}</td>{% endif %}
+          <td><a href="{% url 'expenses:expense_detail' expense.pk %}">{{ expense.description }}</a></td>
+          <td>{{ expense.category }}</td>
+          <td>{{ expense.expense_date }}</td>
+          <td>{{ expense.amount }} {{ expense.currency }}</td>
+          <td>
+            {% if expense.status == "submitted" %}<span class="badge text-bg-warning">Inskickad</span>
+            {% elif expense.status == "approved" %}<span class="badge text-bg-success">Attesterad</span>
+            {% elif expense.status == "rejected" %}<span class="badge text-bg-danger">Avvisad</span>
+            {% elif expense.status == "exported" %}<span class="badge text-bg-secondary">Exporterad</span>
+            {% endif %}
+          </td>
+        </tr>
+        {% empty %}
+        <tr><td colspan="6" class="empty-state"><i class="bi bi-receipt d-block mb-2"></i>Inga utlägg ännu.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

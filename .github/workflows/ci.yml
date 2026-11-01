@@ -1,0 +1,45 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.13"
+      - name: Installera ruff
+        run: pip install "$(grep '^ruff==' requirements-dev.txt)"
+      - name: Lint
+        run: ruff check .
+
+  test:
+    runs-on: ubuntu-latest
+    env:
+      DJANGO_SECRET_KEY: ci-only
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.13"
+          cache: pip
+      - uses: actions/setup-node@v7
+        with:
+          node-version: "20"
+          cache: npm
+      - name: Installera beroenden
+        run: pip install -r requirements.lock
+      # Bootstrap vendoras från node_modules via STATICFILES_DIRS.
+      - name: Installera frontend-beroenden
+        run: npm ci
+      # STORAGES använder WhiteNoises manifest-lagring utan DEBUG, så {% static %}
+      # kastar "Missing staticfiles manifest entry" i varje mall utan collectstatic.
+      - name: Samla statiska filer
+        run: python manage.py collectstatic --noinput
+      - name: Kör tester
+        run: python manage.py test

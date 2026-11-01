@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+{% block title %}Kilometerrapport – ExpenseVibe{% endblock %}
+{% block page_title %}Kilometerrapport{% endblock %}
+{% block nav_mileage_list %}active{% endblock %}
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-12 col-lg-7">
+    <div class="card shadow-sm">
+      <div class="card-body">
+        <div class="d-flex justify-content-between align-items-start mb-3">
+          <h5 class="mb-0">{{ report.start_location }} → {{ report.end_location }}</h5>
+          {% if report.status == "submitted" %}<span class="badge text-bg-warning">Inskickad</span>
+          {% elif report.status == "approved" %}<span class="badge text-bg-success">Attesterad</span>
+          {% elif report.status == "rejected" %}<span class="badge text-bg-danger">Avvisad</span>
+          {% elif report.status == "exported" %}<span class="badge text-bg-secondary">Exporterad</span>
+          {% endif %}
+        </div>
+        <dl class="row">
+          <dt class="col-4">Anställd</dt><dd class="col-8">{{ report.employee.get_full_name|default:report.employee.email }}</dd>
+          <dt class="col-4">Datum</dt><dd class="col-8">{{ report.date }}</dd>
+          <dt class="col-4">Syfte</dt><dd class="col-8">{{ report.purpose }}</dd>
+          <dt class="col-4">Antal km</dt><dd class="col-8">{{ report.distance_km }}</dd>
+          <dt class="col-4">Sats</dt><dd class="col-8">{{ report.rate_snapshot }} kr/km</dd>
+          <dt class="col-4">Ersättning</dt><dd class="col-8">{{ report.compensation_amount }} SEK</dd>
+          <dt class="col-4">Inskickad</dt><dd class="col-8">{{ report.submitted_at }}</dd>
+          {% if report.decided_at %}
+          <dt class="col-4">Beslutad av</dt><dd class="col-8">{{ report.decided_by }} ({{ report.decided_at }})</dd>
+          {% endif %}
+          {% if report.decision_comment %}
+          <dt class="col-4">Kommentar</dt><dd class="col-8">{{ report.decision_comment }}</dd>
+          {% endif %}
+        </dl>
+        {% if report.employee == user and report.is_editable %}
+        <div class="d-flex gap-2 mt-3">
+          <a href="{% url 'mileage:mileagereport_edit' report.pk %}" class="btn btn-outline-secondary">Redigera</a>
+          <a href="{% url 'mileage:mileagereport_delete' report.pk %}" class="btn btn-outline-danger">Ta bort</a>
+        </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

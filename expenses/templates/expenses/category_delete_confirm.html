@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% block title %}Ta bort kategori – ExpenseVibe{% endblock %}
+{% block page_title %}Ta bort kategori{% endblock %}
+{% block nav_categories %}active{% endblock %}
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-12 col-lg-6">
+    <div class="card shadow-sm">
+      <div class="card-body p-4">
+        <p>Ta bort kategorin <strong>{{ category.name }}</strong>?</p>
+        {% if not category.can_delete %}
+        <div class="alert alert-info small">Kategorin har kopplade utlägg och kan inte tas bort helt - den inaktiveras istället.</div>
+        {% endif %}
+        <form method="post">
+          {% csrf_token %}
+          <div class="d-flex gap-2">
+            <button type="submit" class="btn btn-danger">{% if category.can_delete %}Ta bort{% else %}Inaktivera{% endif %}</button>
+            <a href="{% url 'expenses:category_list' %}" class="btn btn-outline-secondary">Avbryt</a>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

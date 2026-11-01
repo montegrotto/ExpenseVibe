@@ -1,0 +1,113 @@
+{% extends "base.html" %}
+{% block title %}Översikt – ExpenseVibe{% endblock %}
+{% block page_title %}Översikt{% endblock %}
+{% block nav_dashboard %}active{% endblock %}
+{% block content %}
+<div class="row g-3 mb-4">
+  <div class="col-6 col-lg-3">
+    <div class="card stat-card shadow-sm h-100">
+      <div class="card-body">
+        <div class="text-muted small">Utlägg inskickade</div>
+        <div class="fs-3 fw-semibold">{{ my_expense_counts.submitted }}</div>
+      </div>
+    </div>
+  </div>
+  <div class="col-6 col-lg-3">
+    <div class="card stat-card shadow-sm h-100">
+      <div class="card-body">
+        <div class="text-muted small">Utlägg attesterade</div>
+        <div class="fs-3 fw-semibold">{{ my_expense_counts.approved }}</div>
+      </div>
+    </div>
+  </div>
+  <div class="col-6 col-lg-3">
+    <div class="card stat-card shadow-sm h-100">
+      <div class="card-body">
+        <div class="text-muted small">Km-rapporter inskickade</div>
+        <div class="fs-3 fw-semibold">{{ my_mileage_counts.submitted }}</div>
+      </div>
+    </div>
+  </div>
+  <div class="col-6 col-lg-3">
+    <div class="card stat-card shadow-sm h-100">
+      <div class="card-body">
+        <div class="text-muted small">Km-rapporter attesterade</div>
+        <div class="fs-3 fw-semibold">{{ my_mileage_counts.approved }}</div>
+      </div>
+    </div>
+  </div>
+  <div class="col-6 col-lg-3">
+    <div class="card stat-card shadow-sm h-100">
+      <div class="card-body">
+        <div class="text-muted small">Tidrapporter inskickade</div>
+        <div class="fs-3 fw-semibold">{{ my_time_report_counts.submitted }}</div>
+      </div>
+    </div>
+  </div>
+  <div class="col-6 col-lg-3">
+    <div class="card stat-card shadow-sm h-100">
+      <div class="card-body">
+        <div class="text-muted small">Tidrapporter attesterade</div>
+        <div class="fs-3 fw-semibold">{{ my_time_report_counts.approved }}</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="d-flex flex-wrap gap-2 mb-4">
+  <a href="{% url 'attachments:upload' %}" class="btn btn-primary"><i class="bi bi-plus-lg"></i> Nytt utlägg</a>
+  <a href="{% url 'mileage:mileagereport_create' %}" class="btn btn-outline-primary"><i class="bi bi-plus-lg"></i> Ny kilometerrapport</a>
+  <a href="{% url 'absence:absence_calendar' %}" class="btn btn-outline-primary"><i class="bi bi-calendar-week"></i> Frånvarokalender</a>
+  {% if user.is_approver and approval_queue_count %}
+  <a href="{% url 'core:approval_queue' %}" class="btn btn-outline-warning"><i class="bi bi-check2-square"></i> {{ approval_queue_count }} väntar på attestering</a>
+  {% endif %}
+</div>
+
+<div class="row g-3">
+  <div class="col-12 col-lg-4">
+    <div class="card shadow-sm">
+      <div class="card-header bg-white">Senaste utlägg</div>
+      <div class="list-group list-group-flush">
+        {% for expense in recent_expenses %}
+        <a href="{% url 'expenses:expense_detail' expense.pk %}" class="list-group-item list-group-item-action d-flex justify-content-between">
+          <span>{{ expense.description }}</span>
+          <span class="text-muted">{{ expense.amount }} {{ expense.currency }}</span>
+        </a>
+        {% empty %}
+        <div class="empty-state"><i class="bi bi-receipt d-block mb-2"></i>Inga utlägg ännu.</div>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+  <div class="col-12 col-lg-4">
+    <div class="card shadow-sm">
+      <div class="card-header bg-white">Senaste kilometerrapporter</div>
+      <div class="list-group list-group-flush">
+        {% for report in recent_mileage %}
+        <a href="{% url 'mileage:mileagereport_detail' report.pk %}" class="list-group-item list-group-item-action d-flex justify-content-between">
+          <span>{{ report.start_location }} → {{ report.end_location }}</span>
+          <span class="text-muted">{{ report.compensation_amount }} SEK</span>
+        </a>
+        {% empty %}
+        <div class="empty-state"><i class="bi bi-signpost-split d-block mb-2"></i>Inga kilometerrapporter ännu.</div>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+  <div class="col-12 col-lg-4">
+    <div class="card shadow-sm">
+      <div class="card-header bg-white">Senaste tidrapporter</div>
+      <div class="list-group list-group-flush">
+        {% for report in recent_time_reports %}
+        <a href="{% url 'absence:timereport_detail' report.pk %}" class="list-group-item list-group-item-action d-flex justify-content-between">
+          <span>{{ report.period }}</span>
+          <span class="text-muted">{{ report.get_status_display }}</span>
+        </a>
+        {% empty %}
+        <div class="empty-state"><i class="bi bi-journal-check d-block mb-2"></i>Inga tidrapporter ännu.</div>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

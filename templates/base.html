@@ -1,0 +1,219 @@
+{% load static %}
+<!doctype html>
+<html lang="sv">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>{% block title %}ExpenseVibe{% endblock %}</title>
+  <link rel="icon" type="image/svg+xml" href="{% static 'brand/icons/expensevibe-icon.svg' %}" />
+  <link rel="icon" type="image/png" sizes="32x32" href="{% static 'brand/icons/expensevibe-icon-32.png' %}" />
+  <link rel="icon" type="image/x-icon" href="{% static 'brand/icons/expensevibe-icon.ico' %}" />
+  <link rel="apple-touch-icon" href="{% static 'brand/icons/expensevibe-icon-256.png' %}" />
+  <link href="{% static 'vendor/bootstrap/css/bootstrap.min.css' %}" rel="stylesheet" />
+  <link href="{% static 'vendor/bootstrap-icons/bootstrap-icons.min.css' %}" rel="stylesheet" />
+  <style>
+    body { background-color: #f8f9fa; }
+    .sidebar {
+      --sidebar-bg: #16223a;
+      --sidebar-bg-accent: #1b2947;
+      --sidebar-hover-bg: #24335a;
+      --sidebar-active-bg: #2a3d6b;
+      background: var(--sidebar-bg);
+    }
+    @media (min-width: 992px) {
+      .sidebar {
+        height: 100vh; position: sticky; top: 0;
+        background-color: var(--sidebar-bg) !important;
+      }
+    }
+    .topbar-toggler {
+      background: none; border: 0; color: #495057; padding: .25rem .5rem;
+      font-size: 1.25rem; line-height: 1; margin-right: .5rem;
+    }
+    .sidebar .side-top { padding: .9rem .9rem .8rem; background: var(--sidebar-bg-accent); border-bottom: 1px solid rgba(255,255,255,.08); }
+    .sidebar .brand { color: #fff; font-size: 1.15rem; font-weight: 700; display: flex; align-items: center; gap: .6rem; text-decoration: none; margin-bottom: .2rem; }
+    .sidebar .brand-logo { width: 34px; height: 34px; flex-shrink: 0; }
+    .sidebar .side-scroll { flex: 1; overflow-y: auto; padding: .5rem 0 .75rem; min-height: 0; scrollbar-width: thin; scrollbar-color: #34406b transparent; }
+    .sidebar .nav-link {
+      display: flex; align-items: center; gap: .65rem;
+      color: #c7d1e6; font-size: .89rem;
+      padding: .44rem .8rem .44rem calc(.8rem - 3px);
+      margin: 1px .55rem; border-radius: 7px;
+      border-left: 3px solid transparent;
+    }
+    .sidebar .nav-link .bi { color: #7e8cab; font-size: 1rem; flex-shrink: 0; width: 1.15em; text-align: center; }
+    .sidebar .nav-link:hover { background: var(--sidebar-hover-bg); color: #fff; }
+    .sidebar .nav-link:hover .bi { color: #c7d1e6; }
+    .sidebar .nav-link.active { background: var(--sidebar-active-bg); color: #fff; border-left-color: #6ea8ff; font-weight: 600; }
+    .sidebar .nav-link.active .bi { color: #6ea8ff; }
+    .sidebar .nav-link .count {
+      margin-left: auto; font-size: .7rem; font-variant-numeric: tabular-nums;
+      background: rgba(255,255,255,.12); color: #c7d1e6;
+      border-radius: 99px; padding: .05rem .45rem;
+    }
+    .sidebar .nav-sect {
+      color: #7e8cab; font-size: .69rem; font-weight: 650;
+      letter-spacing: .09em; text-transform: uppercase;
+      padding: .8rem .95rem .3rem;
+    }
+    .sidebar .side-foot {
+      border-top: 1px solid rgba(255,255,255,.08); padding: .7rem .9rem;
+      display: flex; align-items: center; gap: .6rem; background: var(--sidebar-bg-accent);
+    }
+    .sidebar .side-foot .avatar {
+      width: 30px; height: 30px; border-radius: 50%; flex-shrink: 0;
+      background: #34406b; color: #fff;
+      display: flex; align-items: center; justify-content: center;
+      font-size: .72rem; font-weight: 650;
+    }
+    .sidebar .side-foot .who { min-width: 0; flex: 1; }
+    .sidebar .side-foot .who .name { color: #fff; font-size: .82rem; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .sidebar .side-foot .who .role { color: #7e8cab; font-size: .72rem; }
+    .sidebar .side-foot .logout {
+      color: #7e8cab; padding: .4rem; border-radius: 7px; display: flex; text-decoration: none;
+      background: none; border: none;
+    }
+    .sidebar .side-foot .logout:hover { background: #222d4f; color: #fff; }
+    .main-content { min-height: 100vh; }
+    .topbar { background: #fff; border-bottom: 1px solid #e8ecf0; }
+    .stat-card { border: none; border-radius: 12px; }
+    .empty-state { padding: 3rem 1rem; text-align: center; color: #6c757d; }
+    .empty-state .bi { font-size: 2.2rem; color: #adb5bd; }
+  </style>
+  {% block extra_head %}{% endblock %}
+</head>
+<body>
+{% if user.is_authenticated %}
+<div class="d-flex">
+  <nav class="sidebar offcanvas-start offcanvas-lg d-flex flex-column" style="width:250px; flex-shrink:0;" tabindex="-1" id="sidebarOffcanvas" aria-labelledby="sidebarOffcanvasLabel">
+    <div class="side-top">
+      <div class="d-flex align-items-start justify-content-between">
+        <a class="brand" href="{% url 'core:dashboard' %}">
+          <img class="brand-logo" src="{% static 'brand/icons/expensevibe-icon.svg' %}" alt="" />
+          <span id="sidebarOffcanvasLabel">ExpenseVibe</span>
+        </a>
+        <button type="button" class="btn-close btn-close-white d-lg-none" data-bs-dismiss="offcanvas" data-bs-target="#sidebarOffcanvas" aria-label="Stäng meny"></button>
+      </div>
+    </div>
+
+    <div class="side-scroll">
+      <a class="nav-link mt-2 {% block nav_dashboard %}{% endblock %}" href="{% url 'core:dashboard' %}">
+        <i class="bi bi-speedometer2" aria-hidden="true"></i>Översikt
+      </a>
+
+      <div class="nav-sect">Mitt arbete</div>
+      <a class="nav-link {% block nav_expense_upload %}{% endblock %}" href="{% url 'attachments:upload' %}">
+        <i class="bi bi-plus-circle" aria-hidden="true"></i>Nytt utlägg
+      </a>
+      <a class="nav-link {% block nav_expense_list %}{% endblock %}" href="{% url 'expenses:expense_list' %}">
+        <i class="bi bi-receipt" aria-hidden="true"></i>Mina utlägg
+      </a>
+      <a class="nav-link {% block nav_inbox %}{% endblock %}" href="{% url 'attachments:inbox' %}">
+        <i class="bi bi-inbox" aria-hidden="true"></i>Bilageinkorg
+      </a>
+      <a class="nav-link {% block nav_mileage_create %}{% endblock %}" href="{% url 'mileage:mileagereport_create' %}">
+        <i class="bi bi-signpost-split" aria-hidden="true"></i>Ny kilometerrapport
+      </a>
+      <a class="nav-link {% block nav_mileage_list %}{% endblock %}" href="{% url 'mileage:mileagereport_list' %}">
+        <i class="bi bi-list-ol" aria-hidden="true"></i>Mina kilometerrapporter
+      </a>
+      <a class="nav-link {% block nav_absence_calendar %}{% endblock %}" href="{% url 'absence:absence_calendar' %}">
+        <i class="bi bi-calendar-week" aria-hidden="true"></i>Frånvarokalender
+      </a>
+      <a class="nav-link {% block nav_timereport_list %}{% endblock %}" href="{% url 'absence:timereport_list' %}">
+        <i class="bi bi-journal-check" aria-hidden="true"></i>Mina tidrapporter
+      </a>
+      <a class="nav-link {% block nav_mobile_app %}{% endblock %}" href="{% url 'accounts:mobile_app' %}">
+        <i class="bi bi-phone" aria-hidden="true"></i>Mobilappen
+      </a>
+
+      {% if user.is_approver %}
+      <div class="nav-sect">Attestering</div>
+      <a class="nav-link {% block nav_approval_queue %}{% endblock %}" href="{% url 'core:approval_queue' %}">
+        <i class="bi bi-check2-square" aria-hidden="true"></i>Attesteringskö
+        {% if pending_approval_count %}<span class="count">{{ pending_approval_count }}</span>{% endif %}
+      </a>
+      {% endif %}
+
+      {% if user.is_admin %}
+      <div class="nav-sect">Administration</div>
+      <a class="nav-link {% block nav_users %}{% endblock %}" href="{% url 'accounts:user_list' %}">
+        <i class="bi bi-people" aria-hidden="true"></i>Användare
+      </a>
+      <a class="nav-link {% block nav_categories %}{% endblock %}" href="{% url 'expenses:category_list' %}">
+        <i class="bi bi-tags" aria-hidden="true"></i>Kategorier
+      </a>
+      <a class="nav-link {% block nav_mileagerates %}{% endblock %}" href="{% url 'mileage:mileagerate_list' %}">
+        <i class="bi bi-cash-coin" aria-hidden="true"></i>Km-satser
+      </a>
+      <a class="nav-link {% block nav_absencetypes %}{% endblock %}" href="{% url 'absence:absencetype_list' %}">
+        <i class="bi bi-calendar-x" aria-hidden="true"></i>Frånvaroarter
+      </a>
+      <a class="nav-link {% block nav_periods %}{% endblock %}" href="{% url 'absence:period_list' %}">
+        <i class="bi bi-calendar-range" aria-hidden="true"></i>Perioder
+      </a>
+      <a class="nav-link {% block nav_workschedules %}{% endblock %}" href="{% url 'absence:workschedule_list' %}">
+        <i class="bi bi-calendar2-week" aria-hidden="true"></i>Arbetsscheman
+      </a>
+      <a class="nav-link {% block nav_absencesettings %}{% endblock %}" href="{% url 'absence:absencesettings_edit' %}">
+        <i class="bi bi-sliders" aria-hidden="true"></i>Frånvaroinställningar
+      </a>
+      <a class="nav-link {% block nav_export %}{% endblock %}" href="{% url 'export:export_list' %}">
+        <i class="bi bi-file-earmark-arrow-down" aria-hidden="true"></i>Export till Visma
+      </a>
+      {% endif %}
+    </div>
+
+    <div class="side-foot">
+      <span class="avatar" aria-hidden="true">{% if user.first_name or user.last_name %}{{ user.first_name|slice:":1"|upper }}{{ user.last_name|slice:":1"|upper }}{% else %}{{ user.email|slice:":1"|upper }}{% endif %}</span>
+      <span class="who">
+        <span class="name d-block">{{ user.get_full_name|default:user.email }}</span>
+        <span class="role d-block">{% if user.is_admin %}Administratör{% elif user.is_approver %}Attestant{% else %}Anställd{% endif %}</span>
+      </span>
+      <form method="post" action="{% url 'accounts:logout' %}">
+        {% csrf_token %}
+        <button type="submit" class="logout" title="Logga ut" aria-label="Logga ut">
+          <i class="bi bi-box-arrow-right" aria-hidden="true"></i>
+        </button>
+      </form>
+    </div>
+  </nav>
+  <div class="flex-grow-1 main-content">
+    <div class="topbar px-3 px-md-4 py-2 d-flex flex-wrap align-items-center gap-2">
+      <button type="button" class="topbar-toggler d-lg-none" data-bs-toggle="offcanvas" data-bs-target="#sidebarOffcanvas" aria-controls="sidebarOffcanvas" aria-label="Öppna meny">
+        <i class="bi bi-list" aria-hidden="true"></i>
+      </button>
+      <h6 class="mb-0 text-muted text-truncate">{% block page_title %}{% endblock %}</h6>
+    </div>
+    <div class="main-content-body px-3 py-3 px-md-4 py-md-4">
+      {% if messages %}
+        {% for msg in messages %}
+          <div class="alert alert-{% if msg.tags == 'error' %}danger{% else %}{{ msg.tags }}{% endif %} alert-dismissible fade show" role="alert">
+            {{ msg }}<button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+          </div>
+        {% endfor %}
+      {% endif %}
+      {% block content %}{% endblock %}
+    </div>
+  </div>
+</div>
+{% else %}
+<div class="container-fluid">
+  {% if messages %}
+    <div class="row justify-content-center mt-3">
+      <div class="col-md-5">
+        {% for msg in messages %}
+          <div class="alert alert-{% if msg.tags == 'error' %}danger{% else %}{{ msg.tags }}{% endif %} alert-dismissible fade show" role="alert">
+            {{ msg }}<button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+          </div>
+        {% endfor %}
+      </div>
+    </div>
+  {% endif %}
+  {% block content_unauth %}{% endblock %}
+</div>
+{% endif %}
+<script src="{% static 'vendor/bootstrap/js/bootstrap.bundle.min.js' %}"></script>
+{% block extra_js %}{% endblock %}
+</body>
+</html>

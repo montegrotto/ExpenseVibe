@@ -1,0 +1,18 @@
+__pycache__/
+*.pyc
+.venv/
+node_modules/
+db.sqlite3
+/staticfiles/
+/media/
+.env
+.env.*
+!.env.example
+*.egg-info/
+.DS_Store
+.ruff_cache/
+.build-venv/
+
+# iOS - Xcode-projektet genereras från ios/project.yml (xcodegen).
+ios/ExpenseVibe.xcodeproj/
+ios/build/

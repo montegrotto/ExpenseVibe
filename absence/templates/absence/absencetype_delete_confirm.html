@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% block title %}Ta bort frånvaroart – ExpenseVibe{% endblock %}
+{% block page_title %}Ta bort frånvaroart{% endblock %}
+{% block nav_absencetypes %}active{% endblock %}
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-12 col-lg-6">
+    <div class="card shadow-sm">
+      <div class="card-body p-4">
+        <p>Ta bort frånvaroarten <strong>{{ absence_type.name }}</strong>? Om den har kopplade frånvaroposter
+        inaktiveras den istället för att tas bort.</p>
+        <form method="post">
+          {% csrf_token %}
+          <div class="d-flex gap-2">
+            <button type="submit" class="btn btn-danger">Ta bort</button>
+            <a href="{% url 'absence:absencetype_list' %}" class="btn btn-outline-secondary">Avbryt</a>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

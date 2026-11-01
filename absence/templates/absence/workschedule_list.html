@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+{% block title %}Arbetsscheman – ExpenseVibe{% endblock %}
+{% block page_title %}Arbetsscheman{% endblock %}
+{% block nav_workschedules %}active{% endblock %}
+{% block content %}
+<h5 class="mb-3">Arbetsscheman</h5>
+<p class="text-muted small">Styr både NormalWorkingTime-blocket i Visma-exporten och hur Hel dag-frånvaro (t.ex.
+semester) räknas om till timmar - en anställds "en hel dag" är deras schemalagda timmar just den veckodagen.
+Nya anställda får automatiskt 8 timmar måndag–fredag, 0 lördag–söndag, tills schemat justeras här (t.ex. för
+deltidare).</p>
+<div class="card shadow-sm">
+  <div class="table-responsive">
+    <table class="table table-hover mb-0 align-middle">
+      <thead>
+        <tr>
+          <th>Anställd</th>
+          <th>Mån</th><th>Tis</th><th>Ons</th><th>Tors</th><th>Fre</th><th>Lör</th><th>Sön</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for employee, schedule in rows %}
+        <tr>
+          <td>{{ employee.get_full_name|default:employee.email }}</td>
+          {% if schedule %}
+          <td>{{ schedule.monday_hours }}</td>
+          <td>{{ schedule.tuesday_hours }}</td>
+          <td>{{ schedule.wednesday_hours }}</td>
+          <td>{{ schedule.thursday_hours }}</td>
+          <td>{{ schedule.friday_hours }}</td>
+          <td>{{ schedule.saturday_hours }}</td>
+          <td>{{ schedule.sunday_hours }}</td>
+          {% else %}
+          <td colspan="7" class="text-muted">8,00 / 8,00 / 8,00 / 8,00 / 8,00 / 0,00 / 0,00 (standard, ej sparat)</td>
+          {% endif %}
+          <td class="text-end">
+            <a href="{% url 'absence:workschedule_edit' employee.pk %}" class="btn btn-sm btn-outline-secondary">Redigera</a>
+          </td>
+        </tr>
+        {% empty %}
+        <tr><td colspan="9" class="empty-state"><i class="bi bi-calendar2-week d-block mb-2"></i>Inga anställda ännu.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

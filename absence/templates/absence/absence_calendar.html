@@ -1,0 +1,88 @@
+{% extends "base.html" %}
+{% block title %}Frånvarokalender – ExpenseVibe{% endblock %}
+{% block page_title %}Frånvarokalender{% endblock %}
+{% block nav_absence_calendar %}active{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
+  <div class="d-flex align-items-center gap-2">
+    <a href="?month={{ prev_month }}" class="btn btn-sm btn-outline-secondary" aria-label="Föregående månad"><i class="bi bi-chevron-left"></i></a>
+    <h5 class="mb-0 text-capitalize">{{ month|date:"F Y" }}</h5>
+    <a href="?month={{ next_month }}" class="btn btn-sm btn-outline-secondary" aria-label="Nästa månad"><i class="bi bi-chevron-right"></i></a>
+  </div>
+  <div>
+    {% if not period %}
+      <span class="badge text-bg-secondary">Perioden är inte öppnad</span>
+    {% elif period.status == "reported" %}
+      <span class="badge text-bg-secondary">Rapporterad</span>
+    {% elif time_report %}
+      {% if time_report.status == "submitted" %}<span class="badge text-bg-warning">Inskickad</span>
+      {% elif time_report.status == "approved" %}<span class="badge text-bg-success">Attesterad</span>
+      {% elif time_report.status == "rejected" %}<span class="badge text-bg-danger">Avvisad</span>
+      {% elif time_report.status == "exported" %}<span class="badge text-bg-secondary">Exporterad</span>
+      {% endif %}
+    {% else %}
+      <span class="badge text-bg-light border">Öppen</span>
+    {% endif %}
+  </div>
+</div>
+
+{% if not period %}
+<div class="alert alert-secondary">Ingen period är öppnad för {{ month|date:"F Y" }} ännu. Kontakta administratören.</div>
+{% elif time_report.status == "rejected" %}
+<div class="alert alert-danger">
+  <strong>Tidrapporten avvisades{% if time_report.decision_comment %}:</strong> {{ time_report.decision_comment }}{% else %}.</strong>{% endif %}
+  Rätta dagarna nedan och markera som färdig igen.
+</div>
+{% elif time_report.status == "submitted" %}
+<div class="alert alert-warning">Tidrapporten är inskickad och väntar på attestering. Dagarna nedan kan inte längre ändras.</div>
+{% endif %}
+
+<div class="card shadow-sm mb-3">
+  <div class="table-responsive">
+    <table class="table table-bordered mb-0 align-top">
+      <thead>
+        <tr class="text-center">
+          <th>Mån</th><th>Tis</th><th>Ons</th><th>Tors</th><th>Fre</th><th class="text-muted">Lör</th><th class="text-muted">Sön</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for week in weeks %}
+        <tr>
+          {% for cell in week %}
+          <td style="min-width:120px; height:96px;" class="{% if cell.blocked %}bg-body-secondary{% endif %}">
+            {% if cell %}
+            <div class="d-flex justify-content-between align-items-start">
+              <span class="{% if cell.is_today %}fw-bold text-primary{% elif cell.blocked %}text-muted{% endif %}">{{ cell.day }}</span>
+              {% if can_edit and not cell.blocked %}
+              <a href="{% url 'absence:absenceentry_create' %}?date={{ cell.date|date:'Y-m-d' }}" class="text-muted" title="Lägg till frånvaro"><i class="bi bi-plus-lg"></i></a>
+              {% endif %}
+            </div>
+            {% if cell.holiday_name %}
+            <div class="small text-muted" title="{{ cell.holiday_name }}">{{ cell.holiday_name }}</div>
+            {% endif %}
+            {% for entry in cell.entries %}
+            <div class="small mb-1">
+              <a href="{% url 'absence:absenceentry_edit' entry.pk %}" class="text-decoration-none">
+                <span class="badge text-bg-light border">{{ entry.absence_type.name }}{% if entry.hours %} {{ entry.hours }}h{% endif %}</span>
+              </a>
+            </div>
+            {% endfor %}
+            {% endif %}
+          </td>
+          {% endfor %}
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+
+{% if can_submit %}
+<form method="post" action="{% url 'absence:timereport_submit' %}"
+      onsubmit="return confirm('Skicka tidrapporten för {{ month|date:'F Y' }} till attestering? Dagarna kan inte ändras efteråt.')">
+  {% csrf_token %}
+  <input type="hidden" name="month" value="{{ month|date:'Y-m' }}">
+  <button type="submit" class="btn btn-primary"><i class="bi bi-check2-square"></i> Markera som färdig</button>
+</form>
+{% endif %}
+{% endblock %}

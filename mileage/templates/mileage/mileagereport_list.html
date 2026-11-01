@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+{% block title %}Kilometerrapporter – ExpenseVibe{% endblock %}
+{% block page_title %}Kilometerrapporter{% endblock %}
+{% block nav_mileage_list %}active{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <h5 class="mb-0">{% if user.is_admin or user.is_approver %}Alla kilometerrapporter{% else %}Mina kilometerrapporter{% endif %}</h5>
+  <a href="{% url 'mileage:mileagereport_create' %}" class="btn btn-primary"><i class="bi bi-plus-lg"></i> Ny kilometerrapport</a>
+</div>
+<div class="card shadow-sm">
+  <div class="table-responsive">
+    <table class="table table-hover mb-0 align-middle">
+      <thead>
+        <tr>
+          {% if user.is_admin or user.is_approver %}<th>Anställd</th>{% endif %}
+          <th>Sträcka</th>
+          <th>Syfte</th>
+          <th>Datum</th>
+          <th>Km</th>
+          <th>Belopp</th>
+          <th>Status</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for report in reports %}
+        <tr>
+          {% if user.is_admin or user.is_approver %}<td>{{ report.employee.get_full_name|default:report.employee.email }}</td>{% endif %}
+          <td><a href="{% url 'mileage:mileagereport_detail' report.pk %}">{{ report.start_location }} → {{ report.end_location }}</a></td>
+          <td>{{ report.purpose }}</td>
+          <td>{{ report.date }}</td>
+          <td>{{ report.distance_km }}</td>
+          <td>{{ report.compensation_amount }} SEK</td>
+          <td>
+            {% if report.status == "submitted" %}<span class="badge text-bg-warning">Inskickad</span>
+            {% elif report.status == "approved" %}<span class="badge text-bg-success">Attesterad</span>
+            {% elif report.status == "rejected" %}<span class="badge text-bg-danger">Avvisad</span>
+            {% elif report.status == "exported" %}<span class="badge text-bg-secondary">Exporterad</span>
+            {% endif %}
+          </td>
+        </tr>
+        {% empty %}
+        <tr><td colspan="7" class="empty-state"><i class="bi bi-signpost-split d-block mb-2"></i>Inga kilometerrapporter ännu.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

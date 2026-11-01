@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+{% block title %}Tidrapporter – ExpenseVibe{% endblock %}
+{% block page_title %}Tidrapporter{% endblock %}
+{% block nav_timereport_list %}active{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <h5 class="mb-0">{% if user.is_admin or user.is_approver %}Alla tidrapporter{% else %}Mina tidrapporter{% endif %}</h5>
+  <a href="{% url 'absence:absence_calendar' %}" class="btn btn-primary"><i class="bi bi-calendar-week"></i> Till kalendern</a>
+</div>
+<div class="card shadow-sm">
+  <div class="table-responsive">
+    <table class="table table-hover mb-0 align-middle">
+      <thead>
+        <tr>
+          {% if user.is_admin or user.is_approver %}<th>Anställd</th>{% endif %}
+          <th>Period</th>
+          <th>Inskickad</th>
+          <th>Status</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for report in reports %}
+        <tr>
+          {% if user.is_admin or user.is_approver %}<td>{{ report.employee.get_full_name|default:report.employee.email }}</td>{% endif %}
+          <td><a href="{% url 'absence:timereport_detail' report.pk %}">{{ report.period }}</a></td>
+          <td>{{ report.submitted_at }}</td>
+          <td>
+            {% if report.status == "submitted" %}<span class="badge text-bg-warning">Inskickad</span>
+            {% elif report.status == "approved" %}<span class="badge text-bg-success">Attesterad</span>
+            {% elif report.status == "rejected" %}<span class="badge text-bg-danger">Avvisad</span>
+            {% elif report.status == "exported" %}<span class="badge text-bg-secondary">Exporterad</span>
+            {% endif %}
+          </td>
+        </tr>
+        {% empty %}
+        <tr><td colspan="4" class="empty-state"><i class="bi bi-journal-check d-block mb-2"></i>Inga tidrapporter ännu.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

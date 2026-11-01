@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+{% block title %}Frånvaroarter – ExpenseVibe{% endblock %}
+{% block page_title %}Frånvaroarter{% endblock %}
+{% block nav_absencetypes %}active{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <h5 class="mb-0">Frånvaroarter</h5>
+  <a href="{% url 'absence:absencetype_create' %}" class="btn btn-primary"><i class="bi bi-plus-lg"></i> Ny frånvaroart</a>
+</div>
+<div class="card shadow-sm">
+  <div class="table-responsive">
+    <table class="table table-hover mb-0 align-middle">
+      <thead>
+        <tr><th>Namn</th><th>Kod (tidkod)</th><th>Granularitet</th><th>Aktiv</th><th></th></tr>
+      </thead>
+      <tbody>
+        {% for absence_type in types %}
+        <tr>
+          <td>{{ absence_type.name }}</td>
+          <td>
+            {% if absence_type.export_code %}{{ absence_type.export_code }}{% else %}
+            <span class="text-danger small"><i class="bi bi-exclamation-triangle"></i> Ingen kod satt – kan inte exporteras korrekt</span>
+            {% endif %}
+          </td>
+          <td>{{ absence_type.get_granularity_display }}</td>
+          <td>{% if absence_type.is_active %}<span class="badge text-bg-success">Aktiv</span>{% else %}<span class="badge text-bg-secondary">Inaktiv</span>{% endif %}</td>
+          <td class="text-end">
+            <a href="{% url 'absence:absencetype_edit' absence_type.pk %}" class="btn btn-sm btn-outline-secondary">Redigera</a>
+            <a href="{% url 'absence:absencetype_delete' absence_type.pk %}" class="btn btn-sm btn-outline-danger">Ta bort</a>
+          </td>
+        </tr>
+        {% empty %}
+        <tr><td colspan="5" class="empty-state"><i class="bi bi-calendar-x d-block mb-2"></i>Inga frånvaroarter ännu.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}
