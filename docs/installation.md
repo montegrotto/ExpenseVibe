@@ -91,10 +91,11 @@ cp .env.example .env   # avkommentera produktionsraderna och fyll i riktiga vär
 docker compose up -d
 ```
 
-Sätt `EXPENSEVIBE_VERSION` i `.env` för att låsa en viss version, annars
-körs `latest`. `docker compose up --build -d` bygger imagen lokalt från
-`Dockerfile` (Python, Node.js, WhiteNoise, Gunicorn) i stället för att
-hämta den.
+`docker compose up` hämtar imagen från Docker Hub. Sätt `EXPENSEVIBE_VERSION`
+i `.env` för att låsa en viss version, annars körs `latest`; uppgradera med
+`docker compose pull && docker compose up -d`. `docker compose up --build -d`
+bygger imagen lokalt från `Dockerfile` (Python, Node.js, WhiteNoise,
+Gunicorn) under samma namn i stället för att hämta den.
 
 Compose läser `.env` automatiskt, både för `${NGINX_HTTP_PORT}` i själva
 YAML-filen och (via `env_file`) som miljö i containrarna. Ändra
