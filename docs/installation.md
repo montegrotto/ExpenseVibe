@@ -174,6 +174,25 @@ upptäckta genom verkliga testimporter i Visma (inte dokumenterade som
   mot personens schema i Visma Lön, ger Visma "Normalarbetstid saknas
   eller har fel format i filen".
 
+## Demodata
+
+`scripts/seed_demo.py` fyller en instans (t.ex. demo.expensevibe.se) med
+fyra påhittade användare - administratör, attestant och två anställda - med
+utlägg, kilometerrapporter, frånvaro och tidrapporter i alla statusar, kvitton
+i inkorgen och en körd Visma-export. Befintliga konton och data rörs inte, och
+skriptet vägrar köra om demoanvändarna redan finns. Alla fyra konton
+(`admin@`, `attestant@`, `erik@` och `sara@demo.expensevibe.se`) får
+lösenordet i `DEMO_PASSWORD`; utan det slumpas ett som skrivs ut.
+
+```
+docker compose exec -T -e DEMO_PASSWORD='...' \
+    web gosu appuser /opt/venv/bin/python /app/manage.py shell < scripts/seed_demo.py
+```
+
+Datumen räknas bakåt från i dag, så kör skriptet när instansen sätts upp.
+Med ReInvGrabber påslaget tar körningen någon minut eftersom varje kvitto
+tolkas vid uppladdningen.
+
 ## Kända begränsningar (v1)
 
 - Ingen e-postnotifiering - attestanter/anställda måste själva logga in och kolla status.
