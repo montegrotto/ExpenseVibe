@@ -28,6 +28,7 @@ struct ExpenseVibeApp: App {
 
 struct MainTabView: View {
     @Environment(Session.self) private var session
+    @Environment(\.scenePhase) private var scenePhase
 
     var body: some View {
         TabView {
@@ -43,6 +44,9 @@ struct MainTabView: View {
             }
             AccountView()
                 .tabItem { Label("Konto", systemImage: "person.circle") }
+        }
+        .onChange(of: scenePhase, initial: true) { _, phase in
+            if phase == .active { Task { await session.refreshUser() } }
         }
         // Ligger här och inte i ExpensesView: en flik som inte visas kan inte visa ett ark.
         .sheet(isPresented: Binding(get: { session.sharedFile != nil }, set: { if !$0 { session.sharedFile = nil } })) {
