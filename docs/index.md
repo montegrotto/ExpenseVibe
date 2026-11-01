@@ -21,4 +21,5 @@ under MIT-licens.
 
 ## Hämta
 
+- [Docker-image](https://hub.docker.com/r/montegrotto/expensevibe) - färdigbyggd för amd64 och arm64, körs med `docker-compose.yml` från källkoden.
 - [Källkod på GitHub](https://github.com/montegrotto/ExpenseVibe) - för webbappen och Docker-drift.
