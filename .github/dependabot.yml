@@ -25,9 +25,9 @@ updates:
     schedule:
       interval: "weekly"
     ignore:
-      # Django 5.2 LTS stödjer Python 3.10-3.14, inte nyare
+      # Python 3.13 överallt (venv, CI, Dockerfile) - bumpas manuellt i en
+      # PR som ändrar alla tre, inte av Dependabot en i taget.
       - dependency-name: "python"
-        versions: [">=3.15"]
 
   - package-ecosystem: "github-actions"
     directory: "/"
