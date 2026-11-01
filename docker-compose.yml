@@ -76,8 +76,10 @@ services:
         condition: service_healthy
     ports:
       - "${NGINX_HTTP_PORT:-80}:80"
+    configs:
+      - source: nginx_conf
+        target: /etc/nginx/conf.d/default.conf
     volumes:
-      - ./nginx/default.conf:/etc/nginx/conf.d/default.conf:ro
       - static-assets:/static:ro
       - media-assets:/media:ro
     restart: unless-stopped
@@ -87,3 +89,59 @@ volumes:
   expensevibe-postgres:
   static-assets:
   media-assets:
+
+# Inline så att en driftsättning bara behöver den här filen och .env
+# (Compose >= 2.23.1). En bind-mount av ./nginx/default.conf blev en tom
+# root-ägd KATALOG när filen saknades på servern och nginx startade aldrig.
+# nginx-variabler skrivs $$namn eftersom Compose själv interpolerar $namn.
+configs:
+  nginx_conf:
+    content: |
+      # Bakom en TLS-terminerande proxy (t.ex. nginx-proxy-manager/Cloudflare)
+      # är nginx egen $$scheme alltid http; skicka vidare det proxyn
+      # rapporterade så Django (SECURE_PROXY_SSL_HEADER) ser requesten som
+      # säker och bygger https-länkar.
+      map $$http_x_forwarded_proto $$expensevibe_forwarded_proto {
+          default $$scheme;
+          https   https;
+      }
+
+      server {
+          listen 80;
+          server_name _;
+
+          client_max_body_size 15m;
+
+          # Ett statiskt `upstream { server web:8000; }`-block slår upp "web" EN
+          # gång när nginx startar - hinner web-containern inte registrera sig i
+          # Dockers nätverk än (t.ex. vid en kallstart av hela stacken) kraschar
+          # nginx direkt med "host not found in upstream" och startar aldrig om
+          # av sig själv. 127.0.0.11 är Dockers inbyggda DNS-server på det
+          # nätverk Compose skapar; med resolver + variabel i proxy_pass slås
+          # "web" upp lat per request istället, så nginx alltid startar och bara
+          # enstaka tidiga requests (innan web hunnit bli klar) får 502.
+          resolver 127.0.0.11 valid=30s;
+
+          location /static/ {
+              alias /static/;
+              access_log off;
+              expires 30d;
+              add_header Cache-Control "public, max-age=2592000";
+          }
+
+          # /media/ serveras medvetet INTE av nginx - bilagorna (kvitton) är
+          # känsliga och hämtas bara via Djangos behörighetsskyddade vyer
+          # (attachments:file/attachments:thumbnail, export:export_download).
+
+          location / {
+              set $$upstream_web web:8000;
+              proxy_pass http://$$upstream_web;
+              proxy_http_version 1.1;
+              proxy_set_header Host $$http_host;
+              proxy_set_header X-Forwarded-For $$proxy_add_x_forwarded_for;
+              proxy_set_header X-Forwarded-Proto $$expensevibe_forwarded_proto;
+              proxy_set_header X-Forwarded-Host $$http_host;
+              proxy_set_header X-Real-IP $$remote_addr;
+              proxy_redirect off;
+          }
+      }

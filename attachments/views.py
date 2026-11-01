@@ -36,7 +36,7 @@ def _get_viewable_attachment(request, pk):
     """Bilagor (kvitton) är känsliga - bara uppladdaren själv samt
     attestanter/admin (som behöver se underlaget i attestkön) får hämta
     filinnehållet. Media serveras därför alltid via de här vyerna, aldrig
-    direkt från /media/ (se expensevibe/urls.py och nginx/default.conf)."""
+    direkt från /media/ (se expensevibe/urls.py och nginx-konfigen i docker-compose.yml)."""
     attachment = get_object_or_404(Attachment, pk=pk)
     user = request.user
     if attachment.uploaded_by_id != user.pk and not (user.is_admin or user.is_approver):
