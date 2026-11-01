@@ -10,8 +10,8 @@ def nav_counts(request):
     from mileage.models import MileageReport
 
     pending = (
-        Expense.objects.filter(status="submitted").count()
-        + MileageReport.objects.filter(status="submitted").count()
-        + TimeReport.objects.filter(status="submitted").count()
+        Expense.pending_for(user).count()
+        + MileageReport.pending_for(user).count()
+        + TimeReport.pending_for(user).count()
     )
     return {"pending_approval_count": pending}

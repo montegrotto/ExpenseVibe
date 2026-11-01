@@ -6,6 +6,7 @@ from django.test import Client, TestCase
 from django.urls import reverse
 from PIL import Image
 
+from absence.models import AbsenceSettings
 from accounts.models import CustomUser
 from attachments.models import Attachment
 from expenses.models import Category, Expense
@@ -119,6 +120,27 @@ class ExpenseUploadFlowTests(TestCase):
         expense.refresh_from_db()
         self.assertEqual(expense.status, "approved")
         self.assertEqual(expense.decided_by, self.employee)
+
+    def test_self_attestation_can_be_disabled(self):
+        settings_obj = AbsenceSettings.get_solo()
+        settings_obj.allow_self_approval = False
+        settings_obj.save()
+        self.employee.is_approver = True
+        self.employee.save()
+        attachment = Attachment.objects.create(file=_fake_receipt_png(), uploaded_by=self.employee)
+        expense = Expense.objects.create(
+            employee=self.employee,
+            attachment=attachment,
+            category=self.category,
+            description="Parkering",
+            expense_date=date(2026, 1, 5),
+            amount="50.00",
+        )
+        response = self.client.get(reverse("core:approval_queue"))
+        self.assertNotContains(response, "Parkering")
+        self.client.post(reverse("core:approve_item", args=["utlagg", expense.pk]))
+        expense.refresh_from_db()
+        self.assertEqual(expense.status, "submitted")
 
 
 class RejectedExpenseResubmitTests(TestCase):

@@ -38,24 +38,19 @@ def dashboard(request):
     }
     if user.is_approver:
         context["approval_queue_count"] = (
-            Expense.objects.filter(status="submitted").count()
-            + MileageReport.objects.filter(status="submitted").count()
-            + TimeReport.objects.filter(status="submitted").count()
+            Expense.pending_for(user).count()
+            + MileageReport.pending_for(user).count()
+            + TimeReport.pending_for(user).count()
         )
     return render(request, "core/dashboard.html", context)
 
 
 @approver_required
 def approval_queue(request):
-    expenses = Expense.objects.filter(status="submitted").select_related("employee", "category").order_by(
-        "submitted_at"
-    )
-    mileage_reports = MileageReport.objects.filter(status="submitted").select_related("employee").order_by(
-        "submitted_at"
-    )
-    time_reports = TimeReport.objects.filter(status="submitted").select_related("employee", "period").order_by(
-        "submitted_at"
-    )
+    user = request.user
+    expenses = Expense.pending_for(user).select_related("employee", "category").order_by("submitted_at")
+    mileage_reports = MileageReport.pending_for(user).select_related("employee").order_by("submitted_at")
+    time_reports = TimeReport.pending_for(user).select_related("employee", "period").order_by("submitted_at")
     return render(
         request,
         "core/approval_queue.html",
@@ -63,15 +58,16 @@ def approval_queue(request):
     )
 
 
-def _get_pending_item(model, pk):
-    """Hämtar posten om den fortfarande går att besluta om. Returnerar
+def _get_pending_item(model, pk, user):
+    """Hämtar posten om `user` fortfarande får besluta om den. Returnerar
     (item, felmeddelande) - vid fel är item None. Ett redan fattat beslut
     (dubbelklick/kapplöpning) ska ge ett meddelande i kön, inte en rå 404.
-    Ingen jävsspärr - självattestering är ett uttryckligt beslut i planen,
-    se expenses.tests.test_self_attestation_is_allowed."""
+    Självattestering styrs av AbsenceSettings.allow_self_approval."""
     item = get_object_or_404(model, pk=pk)
     if not item.is_pending:
         return None, "Posten är redan beslutad."
+    if not model.pending_for(user).filter(pk=pk).exists():
+        return None, "Du får inte attestera dina egna poster."
     return item, None
 
 
@@ -80,7 +76,7 @@ def approve_item(request, kind, pk):
     model = _MODELS_BY_KIND.get(kind)
     if model is None or request.method != "POST":
         return redirect("core:approval_queue")
-    item, error = _get_pending_item(model, pk)
+    item, error = _get_pending_item(model, pk, request.user)
     if item is None:
         messages.error(request, error)
         return redirect("core:approval_queue")
@@ -94,7 +90,7 @@ def reject_item(request, kind, pk):
     model = _MODELS_BY_KIND.get(kind)
     if model is None:
         return redirect("core:approval_queue")
-    item, error = _get_pending_item(model, pk)
+    item, error = _get_pending_item(model, pk, request.user)
     if item is None:
         messages.error(request, error)
         return redirect("core:approval_queue")

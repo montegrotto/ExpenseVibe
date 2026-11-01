@@ -44,9 +44,10 @@ class AbsenceTypeForm(forms.ModelForm):
 class AbsenceSettingsForm(forms.ModelForm):
     class Meta:
         model = AbsenceSettings
-        fields = ["block_weekends_and_holidays"]
+        fields = ["block_weekends_and_holidays", "allow_self_approval"]
         widgets = {
             "block_weekends_and_holidays": forms.CheckboxInput(attrs={"class": "form-check-input"}),
+            "allow_self_approval": forms.CheckboxInput(attrs={"class": "form-check-input"}),
         }
 
 

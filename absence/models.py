@@ -42,11 +42,13 @@ class AbsenceType(models.Model):
 
 
 class AbsenceSettings(models.Model):
-    """Enda-rad-konfiguration (singleton, pk alltid 1)."""
+    """Enda-rad-konfiguration (singleton, pk alltid 1). Trots namnet
+    systemets enda inställningssida - även allow_self_approval bor här."""
 
     block_weekends_and_holidays = models.BooleanField(
         "Blockera rapportering på lördagar, söndagar och helgdagar", default=True
     )
+    allow_self_approval = models.BooleanField("Attestanter får attestera sina egna poster", default=True)
     updated_at = models.DateTimeField("Uppdaterad", auto_now=True)
     updated_by = models.ForeignKey(
         settings.AUTH_USER_MODEL,
@@ -58,11 +60,11 @@ class AbsenceSettings(models.Model):
     )
 
     class Meta:
-        verbose_name = "Frånvaroinställning"
-        verbose_name_plural = "Frånvaroinställningar"
+        verbose_name = "Inställning"
+        verbose_name_plural = "Inställningar"
 
     def __str__(self):
-        return "Frånvaroinställningar"
+        return "Inställningar"
 
     def save(self, *args, **kwargs):
         self.pk = 1
