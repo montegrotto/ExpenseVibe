@@ -11,6 +11,9 @@ Dokumentation: **[expensevibe.se](https://expensevibe.se)**
 - [Installation och drift](docs/installation.md) - miljövariabler, Docker, Visma-export, kända begränsningar.
 - [iPhone-app](ios/README.md).
 
+Färdigbyggda imager (amd64 och arm64) publiceras på Docker Hub som
+[`montegrotto/expensevibe`](https://hub.docker.com/r/montegrotto/expensevibe).
+
 ## Snabbstart
 
 Kräver Python 3.13 och Node.js (för att vendora Bootstrap).

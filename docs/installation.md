@@ -81,14 +81,20 @@ kilometerrapporter samt attestera dem. Den pratar med JSON-API:t under
 
 ## Docker
 
-`Dockerfile` bygger produktionsimagen (Python, Node.js, WhiteNoise, Gunicorn)
-och `docker-compose.yml` kör den med PostgreSQL, nginx och ReInvGrabber i
-samma nätverk. Utveckling sker utan Docker, se Körning ovan.
+Färdigbyggda imager (amd64 och arm64) publiceras på Docker Hub som
+[`montegrotto/expensevibe`](https://hub.docker.com/r/montegrotto/expensevibe)
+vid varje release. `docker-compose.yml` kör den med PostgreSQL, nginx och
+ReInvGrabber i samma nätverk. Utveckling sker utan Docker, se Körning ovan.
 
 ```
 cp .env.example .env   # avkommentera produktionsraderna och fyll i riktiga värden
-docker compose up --build -d
+docker compose up -d
 ```
+
+Sätt `EXPENSEVIBE_VERSION` i `.env` för att låsa en viss version, annars
+körs `latest`. `docker compose up --build -d` bygger imagen lokalt från
+`Dockerfile` (Python, Node.js, WhiteNoise, Gunicorn) i stället för att
+hämta den.
 
 Compose läser `.env` automatiskt, både för `${NGINX_HTTP_PORT}` i själva
 YAML-filen och (via `env_file`) som miljö i containrarna. Ändra

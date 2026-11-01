@@ -1,5 +1,8 @@
 services:
   web:
+    # Färdigbyggd image från Docker Hub (amd64/arm64). `docker compose up
+    # --build` bygger lokalt från Dockerfile i stället.
+    image: montegrotto/expensevibe:${EXPENSEVIBE_VERSION:-latest}
     build:
       context: .
       dockerfile: Dockerfile
