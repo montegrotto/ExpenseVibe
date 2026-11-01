@@ -182,6 +182,14 @@ final class Session {
             || host.allSatisfy { $0.isNumber || $0 == "." }
     }
 
+    /// Admin kan ändra attestantrollen medan man är inloggad - hämtas om när appen blir aktiv.
+    func refreshUser() async {
+        struct Me: Decodable { let user: User }
+        guard let me: Me = try? await get("me/") else { return }
+        user = me.user
+        UserDefaults.standard.set(try? JSONEncoder().encode(me.user), forKey: "user")
+    }
+
     private func signIn(token: String, user: User) {
         self.token = token
         self.user = user
