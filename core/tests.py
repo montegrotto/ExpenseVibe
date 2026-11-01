@@ -50,6 +50,8 @@ class SeedDemoTests(TestCase):
             runpy.run_path(script)
             with self.assertRaises(SystemExit):
                 runpy.run_path(script)
+            batch = ExportBatch.objects.get()
+            self.assertIn(b"SalaryData", batch.file.read())
 
         user = get_user_model().objects.get(email="erik@demo.expensevibe.se")
         self.assertTrue(user.check_password("demo"))
@@ -61,6 +63,4 @@ class SeedDemoTests(TestCase):
         self.assertEqual(TimeReport.objects.filter(status="exported").count(), 2)
         self.assertEqual(Period.objects.filter(status="reported").count(), 1)
         self.assertEqual(Attachment.objects.filter(expense__isnull=True).count(), 3)
-        batch = ExportBatch.objects.get()
         self.assertEqual(batch.row_count, 7)
-        self.assertIn(b"SalaryData", batch.file.read())
