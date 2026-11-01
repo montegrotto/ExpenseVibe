@@ -1,8 +1,10 @@
 services:
   web:
-    # Färdigbyggd image från Docker Hub (amd64/arm64). `docker compose up
-    # --build` bygger lokalt från Dockerfile i stället.
+    # Färdigbyggd image från Docker Hub (amd64/arm64). pull_policy gör att
+    # `docker compose up` hämtar den i stället för att bygga när den saknas
+    # lokalt; `docker compose up --build` bygger från Dockerfile under samma namn.
     image: montegrotto/expensevibe:${EXPENSEVIBE_VERSION:-latest}
+    pull_policy: missing
     build:
       context: .
       dockerfile: Dockerfile
